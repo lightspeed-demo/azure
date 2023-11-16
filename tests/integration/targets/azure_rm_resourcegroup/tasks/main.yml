@@ -1,3 +1,4 @@
+---
 - name: Get resource group datalake info
   azure_rm_resourcegroup_info:
     name: "{{ resource_group_datalake }}"
