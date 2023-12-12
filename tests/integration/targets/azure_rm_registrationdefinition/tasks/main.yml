@@ -1,3 +1,4 @@
+---
 - name: Set facts
   ansible.builtin.set_fact:
     subscription_id: "{{ azure_subscription_id }}"
