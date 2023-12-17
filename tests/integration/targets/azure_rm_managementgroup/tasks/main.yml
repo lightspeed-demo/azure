@@ -1,3 +1,4 @@
+---
 - name: Get list of all managementgroups
   azure_rm_managementgroup_info:
   register: az_all_managementgroups
