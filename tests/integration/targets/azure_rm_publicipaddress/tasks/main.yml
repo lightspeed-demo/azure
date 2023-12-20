@@ -1,18 +1,19 @@
+---
 - name: Create domain name
   ansible.builtin.set_fact:
-    domain_name: "ansible-{{ resource_group | hash('md5') | truncate(24, True, '') }}"
+    domain_name: ansible-{{ resource_group | hash('md5') | truncate(24, True, '') }}
     rpfx: "{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
 
 - name: Remove public ip
   azure_rm_publicipaddress:
     resource_group: "{{ resource_group }}"
-    name: "pip{{ rpfx }}"
+    name: pip{{ rpfx }}
     state: absent
 
 - name: Create public ip
   azure_rm_publicipaddress:
     resource_group: "{{ resource_group }}"
-    name: "pip{{ rpfx }}"
+    name: pip{{ rpfx }}
     allocation_method: Static
     domain_name: "{{ domain_name }}"
     tags:
@@ -31,11 +32,11 @@
 - name: Create public ip with IPV6
   azure_rm_publicipaddress:
     resource_group: "{{ resource_group }}"
-    name: "pip{{ rpfx }}-02"
+    name: pip{{ rpfx }}-02
     allocation_method: Static
     domain_name: "{{ domain_name }}-02"
-    version: 'ipv6'
-    sku: 'Standard'
+    version: ipv6
+    sku: Standard
     zones:
       - 1
   register: output
@@ -49,7 +50,7 @@
 - name: Should be idempotent
   azure_rm_publicipaddress:
     resource_group: "{{ resource_group }}"
-    name: "pip{{ rpfx }}"
+    name: pip{{ rpfx }}
     allocation_method: static
     domain_name: "{{ domain_name }}"
   register: output
@@ -61,7 +62,7 @@
 - name: Update tags
   azure_rm_publicipaddress:
     resource_group: "{{ resource_group }}"
-    name: "pip{{ rpfx }}"
+    name: pip{{ rpfx }}
     allocation_method: static
     domain_name: "{{ domain_name }}"
     append_tags: true
@@ -91,7 +92,7 @@
 - name: Purge all tags
   azure_rm_publicipaddress:
     resource_group: "{{ resource_group }}"
-    name: "pip{{ rpfx }}"
+    name: pip{{ rpfx }}
     allocation_method: static
     domain_name: "{{ domain_name }}"
     append_tags: false
@@ -105,13 +106,13 @@
 - name: Gather facts for a public ip
   azure_rm_publicipaddress_info:
     resource_group: "{{ resource_group }}"
-    name: "pip{{ rpfx }}"
+    name: pip{{ rpfx }}
   register: pip
 
 - name: Assert the public ip address facts
   ansible.builtin.assert:
     that:
-      - "pip.publicipaddresses | length == 1"
+      - pip.publicipaddresses | length == 1
       - pip.publicipaddresses[0].name == "pip{{ rpfx }}"
       - pip.publicipaddresses[0].allocation_method == 'static'
       - pip.publicipaddresses[0].dns_settings.domain_name_label == domain_name
@@ -128,19 +129,19 @@
 - name: Remove IPV6 public ip
   azure_rm_publicipaddress:
     resource_group: "{{ resource_group }}"
-    name: "pip{{ rpfx }}-02"
+    name: pip{{ rpfx }}-02
     state: absent
 
 - name: Remove public ip
   azure_rm_publicipaddress:
     resource_group: "{{ resource_group }}"
-    name: "pip{{ rpfx }}"
+    name: pip{{ rpfx }}
     state: absent
 
 - name: Gather facts for a public ip
   azure_rm_publicipaddress_info:
     resource_group: "{{ resource_group }}"
-    name: "pip{{ rpfx }}"
+    name: pip{{ rpfx }}
   register: infos
 
 - name: Assert public ip address facts
