@@ -1,6 +1,7 @@
+---
 - name: Create random ddos protection plan
   ansible.builtin.set_fact:
-    ddosprotectionplan: "test{{ resource_group | hash('md5') | truncate(16, True, '') + (65535 | random | string) }}"
+    ddosprotectionplan: test{{ resource_group | hash('md5') | truncate(16, True, '') + (65535 | random | string) }}
 
 - name: Create DDoS protection plan (check mode)
   azure_rm_ddosprotectionplan:
