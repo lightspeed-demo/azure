@@ -1,3 +1,4 @@
+---
 - name: Set Bastion host name
   ansible.builtin.set_fact:
     rpfx: "{{ resource_group | hash('md5') | truncate(8, True, '') }}"
@@ -10,7 +11,7 @@
 - name: Create virtual network
   azure_rm_virtualnetwork:
     resource_group: "{{ resource_group }}"
-    name: "vnet{{ rpfx }}"
+    name: vnet{{ rpfx }}
     address_prefixes_cidr:
       - 10.1.0.0/16
       - 172.100.0.0/16
@@ -21,27 +22,27 @@
   azure_rm_subnet:
     resource_group: "{{ resource_group }}"
     name: AzureBastionSubnet
-    virtual_network_name: "vnet{{ rpfx }}"
-    address_prefix_cidr: "10.1.0.0/26"
+    virtual_network_name: vnet{{ rpfx }}
+    address_prefix_cidr: 10.1.0.0/26
   register: subnet_output
 
 - name: Create public ip
   azure_rm_publicipaddress:
     resource_group: "{{ resource_group }}"
-    name: "pip{{ rpfx }}"
+    name: pip{{ rpfx }}
     allocation_method: Static
     sku: Standard
 
 - name: Get public ip ID
   azure_rm_publicipaddress_info:
     resource_group: "{{ resource_group }}"
-    name: "pip{{ rpfx }}"
+    name: pip{{ rpfx }}
   register: publicip_output
 
 - name: Create bastion host (checkmode test)
   azure_rm_bastionhost:
     resource_group: "{{ resource_group }}"
-    name: "bh{{ rpfx }}"
+    name: bh{{ rpfx }}
     ip_configurations:
       - name: testip_configuration
         subnet:
@@ -65,7 +66,7 @@
 - name: Create bastion host
   azure_rm_bastionhost:
     resource_group: "{{ resource_group }}"
-    name: "bh{{ rpfx }}"
+    name: bh{{ rpfx }}
     ip_configurations:
       - name: testip_configuration
         subnet:
@@ -93,7 +94,7 @@
 - name: Create bastion host (Idempotent Test)
   azure_rm_bastionhost:
     resource_group: "{{ resource_group }}"
-    name: "bh{{ rpfx }}"
+    name: bh{{ rpfx }}
     ip_configurations:
       - name: testip_configuration
         subnet:
@@ -119,14 +120,13 @@
       - not output.changed
 
 - name: Pause for 20 mimutes to Bastion host updating
-  ansible.builtin.command:
-    sleep 1200
+  ansible.builtin.command: sleep 1200
   changed_when: true
 
 - name: Update bastion host
   azure_rm_bastionhost:
     resource_group: "{{ resource_group }}"
-    name: "bh{{ rpfx }}"
+    name: bh{{ rpfx }}
     ip_configurations:
       - name: testip_configuration
         subnet:
@@ -154,7 +154,7 @@
 - name: Get bastion host info
   azure_rm_bastionhost_info:
     resource_group: "{{ resource_group }}"
-    name: "bh{{ rpfx }}"
+    name: bh{{ rpfx }}
   register: output
 
 - name: Assert the bastion host is well create
@@ -171,5 +171,5 @@
 - name: Delete bastion host
   azure_rm_bastionhost:
     resource_group: "{{ resource_group }}"
-    name: "bh{{ rpfx }}"
+    name: bh{{ rpfx }}
     state: absent
