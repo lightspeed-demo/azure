@@ -1,3 +1,4 @@
+---
 - name: Set location
   ansible.builtin.set_fact:
     location: eastus
@@ -7,8 +8,8 @@
     location: "{{ location }}"
     publisher: OpenLogic
     offer: CentOS
-    sku: '7.5'
-    version: '7.5.201808150'
+    sku: "7.5"
+    version: 7.5.201808150
   register: output
 
 - name: Assert the image facts
@@ -20,7 +21,7 @@
     location: "{{ location }}"
     publisher: OpenLogic
     offer: CentOS
-    sku: '7.5'
+    sku: "7.5"
   register: output
 
 - name: Assert all image version facts
@@ -51,8 +52,8 @@
     location: "{{ location }}"
     publisher: OpenLogic
     offer: CentOS
-    sku: '7.5'
-    version: 'latest'
+    sku: "7.5"
+    version: latest
   register: output
 
 - name: Assert image facts
