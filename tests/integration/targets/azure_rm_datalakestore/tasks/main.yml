@@ -1,7 +1,8 @@
+---
 - name: Create data lake store name
   ansible.builtin.set_fact:
-    adl_name: "adl{{ resource_group_datalake | hash('md5') | truncate(21, True, '') }}"
-    vnet_name: "vnet{{ resource_group_datalake | hash('md5') | truncate(20, True, '') }}"
+    adl_name: adl{{ resource_group_datalake | hash('md5') | truncate(21, True, '') }}
+    vnet_name: vnet{{ resource_group_datalake | hash('md5') | truncate(20, True, '') }}
 
 - name: Create virtual network
   azure_rm_virtualnetwork:
@@ -16,7 +17,7 @@
     name: foobar
     virtual_network_name: "{{ vnet_name }}"
     resource_group: "{{ resource_group_datalake }}"
-    address_prefix_cidr: "10.1.1.0/24"
+    address_prefix_cidr: 10.1.1.0/24
     service_endpoints:
       - service: Microsoft.AzureActiveDirectory
   register: subnet_output
