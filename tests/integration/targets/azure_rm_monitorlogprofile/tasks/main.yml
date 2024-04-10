@@ -1,13 +1,14 @@
+---
 - name: Prepare random number
   ansible.builtin.set_fact:
-    storage_name: "storage{{ resource_group | hash('md5') | truncate(5, True, '') }}{{ 1000 | random }}"
-    profile_name: "profile{{ resource_group | hash('md5') | truncate(5, True, '') }}{{ 1000 | random }}"
+    storage_name: storage{{ resource_group | hash('md5') | truncate(5, True, '') }}{{ 1000 | random }}
+    profile_name: profile{{ resource_group | hash('md5') | truncate(5, True, '') }}{{ 1000 | random }}
     location: eastus
   run_once: true
 
 - name: Create Azure storage account
   azure_rm_storageaccount:
-    name: '{{ storage_name }}'
+    name: "{{ storage_name }}"
     resource_group: "{{ resource_group }}"
     account_type: Standard_LRS
 
