@@ -1,3 +1,4 @@
+---
 - name: Prepare random number
   ansible.builtin.set_fact:
     rpfx: "{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
@@ -7,8 +8,8 @@
 - name: Clearing (if) previous disks were created
   azure_rm_manageddisk:
     resource_group: "{{ resource_group }}"
-    name: "md{{ rpfx }}{{ item }}"
-    managed_by: ''
+    name: md{{ rpfx }}{{ item }}
+    managed_by: ""
     state: absent
   with_items:
     - 1
@@ -18,7 +19,7 @@
 - name: Test invalid account name (should give error)
   azure_rm_manageddisk:
     resource_group: "{{ resource_group }}"
-    name: "invalid_char$"
+    name: invalid_char$
     disk_size_gb: 1
   register: output
   ignore_errors: true
@@ -30,8 +31,8 @@
 - name: Create managed disk (Check Mode)
   azure_rm_manageddisk:
     resource_group: "{{ resource_group }}"
-    name: "md{{ rpfx }}1"
-    storage_account_type: "Standard_LRS"
+    name: md{{ rpfx }}1
+    storage_account_type: Standard_LRS
     disk_size_gb: 1
     tags:
       testing: testing
@@ -48,8 +49,8 @@
 - name: Create new managed disk succesfully
   azure_rm_manageddisk:
     resource_group: "{{ resource_group }}"
-    name: "md{{ rpfx }}1"
-    storage_account_type: "Standard_LRS"
+    name: md{{ rpfx }}1
+    storage_account_type: Standard_LRS
     disk_size_gb: 1
     tags:
       testing: testing
@@ -68,8 +69,8 @@
 - name: Copy disk to a new managed disk
   azure_rm_manageddisk:
     resource_group: "{{ resource_group }}"
-    name: "md{{ rpfx }}2"
-    create_option: "copy"
+    name: md{{ rpfx }}2
+    create_option: copy
     source_uri: "{{ output.state.id }}"
     disk_size_gb: 1
   register: disk2
@@ -83,7 +84,7 @@
 - name: Create disk to a new managed disk with zone and os type
   azure_rm_manageddisk:
     resource_group: "{{ resource_group }}"
-    name: "md{{ rpfx }}3"
+    name: md{{ rpfx }}3
     source_uri: "{{ output.state.id }}"
     disk_size_gb: 1
     zone: "1"
@@ -101,8 +102,8 @@
 - name: Change storage account type to an invalid type
   azure_rm_manageddisk:
     resource_group: "{{ resource_group }}"
-    name: "md{{ rpfx }}1"
-    storage_account_type: "PremiumL"
+    name: md{{ rpfx }}1
+    storage_account_type: PremiumL
     disk_size_gb: 1
   register: output
   ignore_errors: true
@@ -113,10 +114,10 @@
 - name: Update disk options (os_type, account_type, size, tags)
   azure_rm_manageddisk:
     resource_group: "{{ resource_group }}"
-    name: "md{{ rpfx }}1"
+    name: md{{ rpfx }}1
     disk_size_gb: 2
     os_type: linux
-    storage_account_type: "StandardSSD_LRS"
+    storage_account_type: StandardSSD_LRS
     tags:
       galaxy: "no"
       delete: never
@@ -128,23 +129,23 @@
       - output.changed
       - output.state.storage_account_type == "StandardSSD_LRS"
       - output.state.disk_size_gb == 2
-      - "output.state.tags | length == 2"
-      - "output.state.tags.galaxy == 'no'"
+      - output.state.tags | length == 2
+      - output.state.tags.galaxy == 'no'
       - output.state.os_type == 'linux'
 
 - name: Gather facts to one specific disk
   azure_rm_manageddisk_info:
     resource_group: "{{ resource_group }}"
-    name: "md{{ rpfx }}1"
+    name: md{{ rpfx }}1
   register: output
 
 - name: Assert the disk facts
   ansible.builtin.assert:
     that:
-      - "output.ansible_info.azure_managed_disk | length == 1"
+      - output.ansible_info.azure_managed_disk | length == 1
       - output.ansible_info.azure_managed_disk[0].storage_account_type == "StandardSSD_LRS"
       - output.ansible_info.azure_managed_disk[0].disk_size_gb == 2
-      - "output.ansible_info.azure_managed_disk[0].os_type == 'linux'"
+      - output.ansible_info.azure_managed_disk[0].os_type == 'linux'
 
 - name: Set variables
   ansible.builtin.set_fact:
@@ -171,8 +172,8 @@
 - name: Create new managed disk with  I(account_type=StandardSSD_ZRS)
   azure_rm_manageddisk:
     resource_group: "{{ resource_group }}"
-    name: "md{{ rpfx }}4"
-    storage_account_type: "StandardSSD_ZRS"
+    name: md{{ rpfx }}4
+    storage_account_type: StandardSSD_ZRS
     disk_size_gb: 2
     location: westus2
   register: output
@@ -187,21 +188,21 @@
 - name: Gather facts to one specific disk
   azure_rm_manageddisk_info:
     resource_group: "{{ resource_group }}"
-    name: "md{{ rpfx }}4"
+    name: md{{ rpfx }}4
   register: output
 
 - name: Assert the managed disk facts
   ansible.builtin.assert:
     that:
-      - "output.ansible_info.azure_managed_disk | length == 1"
+      - output.ansible_info.azure_managed_disk | length == 1
       - output.ansible_info.azure_managed_disk[0].storage_account_type == "StandardSSD_ZRS"
       - output.ansible_info.azure_managed_disk[0].disk_size_gb == 2
 
 - name: Create new managed disk with  I(account_type=Premium_ZRS)
   azure_rm_manageddisk:
     resource_group: "{{ resource_group }}"
-    name: "md{{ rpfx }}5"
-    storage_account_type: "Premium_ZRS"
+    name: md{{ rpfx }}5
+    storage_account_type: Premium_ZRS
     disk_size_gb: 2
     location: westus2
   register: output
@@ -216,20 +217,20 @@
 - name: Gather facts to one specific disk
   azure_rm_manageddisk_info:
     resource_group: "{{ resource_group }}"
-    name: "md{{ rpfx }}5"
+    name: md{{ rpfx }}5
   register: output
 
 - name: Assert the managed disk facts
   ansible.builtin.assert:
     that:
-      - "output.ansible_info.azure_managed_disk | length == 1"
+      - output.ansible_info.azure_managed_disk | length == 1
       - output.ansible_info.azure_managed_disk[0].storage_account_type == "Premium_ZRS"
       - output.ansible_info.azure_managed_disk[0].disk_size_gb == 2
 
 - name: Delete managed disk (Check Mode)
   azure_rm_manageddisk:
     resource_group: "{{ resource_group }}"
-    name: "md{{ rpfx }}1"
+    name: md{{ rpfx }}1
     state: absent
   register: output
   check_mode: true
@@ -243,8 +244,8 @@
 - name: Delete all managed disk
   azure_rm_manageddisk:
     resource_group: "{{ resource_group }}"
-    name: "md{{ rpfx }}{{ item }}"
-    managed_by: ''
+    name: md{{ rpfx }}{{ item }}
+    managed_by: ""
     state: absent
   with_items:
     - 1
@@ -256,7 +257,7 @@
 - name: Delete virtual machine
   azure_rm_virtualmachine:
     resource_group: "{{ resource_group }}"
-    name: "tr{{ rpfx }}"
+    name: tr{{ rpfx }}
     state: absent
     vm_size: Standard_DS1_v2
 
@@ -264,5 +265,5 @@
   azure_rm_publicipaddress:
     resource_group: "{{ resource_group }}"
     allocation_method: Static
-    name: "tr{{ rpfx }}"
+    name: tr{{ rpfx }}
     state: absent
