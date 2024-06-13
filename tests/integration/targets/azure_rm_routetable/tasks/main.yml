@@ -1,7 +1,8 @@
+---
 - name: Prepare random number
   ansible.builtin.set_fact:
-    name_rpfx: "table{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
-    route_name: "route{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
+    name_rpfx: table{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}
+    route_name: route{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}
   run_once: true
 
 - name: Create a route table (check mode)
@@ -55,15 +56,15 @@
 - name: Assert the route table facts
   ansible.builtin.assert:
     that:
-      - "output.route_tables | length == 1"
-      - "output.route_tables[0].routes | length == 0"
+      - output.route_tables | length == 1
+      - output.route_tables[0].routes | length == 0
 
 - name: Create route (check mode)
   azure_rm_route:
     name: "{{ route_name }}"
     resource_group: "{{ resource_group }}"
     next_hop_type: virtual_network_gateway
-    address_prefix: "10.1.0.0/16"
+    address_prefix: 10.1.0.0/16
     route_table_name: "{{ name_rpfx }}"
   check_mode: true
   register: output
@@ -79,7 +80,7 @@
     name: "{{ route_name }}"
     resource_group: "{{ resource_group }}"
     next_hop_type: virtual_network_gateway
-    address_prefix: "10.1.0.0/16"
+    address_prefix: 10.1.0.0/16
     route_table_name: "{{ name_rpfx }}"
   register: output
 
@@ -94,7 +95,7 @@
     name: "{{ route_name }}"
     resource_group: "{{ resource_group }}"
     next_hop_type: virtual_network_gateway
-    address_prefix: "10.1.0.0/16"
+    address_prefix: 10.1.0.0/16
     route_table_name: "{{ name_rpfx }}"
   register: output
 
@@ -108,7 +109,7 @@
     name: "{{ route_name }}"
     resource_group: "{{ resource_group }}"
     next_hop_type: virtual_network_gateway
-    address_prefix: "10.1.0.0/24"
+    address_prefix: 10.1.0.0/24
     route_table_name: "{{ name_rpfx }}"
   register: output
 
@@ -139,8 +140,8 @@
 - name: Assert the route table facts
   ansible.builtin.assert:
     that:
-      - "output.route_tables | length == 1"
-      - "output.route_tables[0].routes | length == 1"
+      - output.route_tables | length == 1
+      - output.route_tables[0].routes | length == 1
       - output.route_tables[0].routes[0].address_prefix == '10.1.0.0/24'
 
 - name: Delete route (check mode)
