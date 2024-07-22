@@ -1,22 +1,21 @@
+---
 - name: Prepare random number
   ansible.builtin.set_fact:
-    set_name: "des{{ resource_group | hash('md5') | truncate(22, True, '') }}"
+    set_name: des{{ resource_group | hash('md5') | truncate(22, True, '') }}
     rpfx: "{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
     tenant_id: "{{ azure_tenant }}"
   run_once: true
 
 - name: Lookup service principal object id
   ansible.builtin.set_fact:
-    object_id: "{{ lookup('azure.azcollection.azure_service_principal_attribute',
-                   azure_client_id=azure_client_id,
-                   azure_secret=azure_secret,
-                   azure_tenant=tenant_id) }}"
+    object_id: "{{ lookup('azure.azcollection.azure_service_principal_attribute', azure_client_id=azure_client_id, azure_secret=azure_secret, azure_tenant=tenant_id)
+      }}"
   register: object_id_facts
 
 - name: Create a key vault
-  azure_rm_keyvault:
+  azure.azcollection.azure_rm_keyvault:
     resource_group: "{{ resource_group }}"
-    vault_name: "myvault{{ rpfx }}"
+    vault_name: myvault{{ rpfx }}
     enabled_for_disk_encryption: true
     vault_tenant: "{{ tenant_id }}"
     sku:
@@ -40,66 +39,66 @@
           - purge
 
 - name: Create a key in key vault
-  azure_rm_keyvaultkey:
+  azure.azcollection.azure_rm_keyvaultkey:
     key_name: testkey
     keyvault_uri: https://myvault{{ rpfx }}.vault.azure.net
 
 - name: Get latest version of key
-  azure_rm_keyvaultkey_info:
+  register: results
+  azure.azcollection.azure_rm_keyvaultkey_info:
     vault_uri: https://myvault{{ rpfx }}.vault.azure.net
     name: testkey
-  register: results
 
 - name: Assert the key vault facts
   ansible.builtin.set_fact:
     key_url: "{{ results['keys'][0]['kid'] }}"
 
 - name: Create disk encryption set
-  azure_rm_diskencryptionset:
+  register: results
+  azure.azcollection.azure_rm_diskencryptionset:
     resource_group: "{{ resource_group }}"
     name: "{{ set_name }}"
-    source_vault: "myvault{{ rpfx }}"
+    source_vault: myvault{{ rpfx }}
     key_url: "{{ key_url }}"
     state: present
-  register: results
 
 - name: Assert that disk encryption set is created
   ansible.builtin.assert:
     that: results.changed
 
 - name: Create disk encryption set (Idempotent test)
-  azure_rm_diskencryptionset:
+  register: results
+  azure.azcollection.azure_rm_diskencryptionset:
     resource_group: "{{ resource_group }}"
     name: "{{ set_name }}"
-    source_vault: "myvault{{ rpfx }}"
+    source_vault: myvault{{ rpfx }}
     key_url: "{{ key_url }}"
     state: present
-  register: results
 
 - name: Assert that output is not changed
   ansible.builtin.assert:
     that: not results.changed
 
 - name: Update disk encryption set
-  azure_rm_diskencryptionset:
+  register: results
+  azure.azcollection.azure_rm_diskencryptionset:
     resource_group: "{{ resource_group }}"
     name: "{{ set_name }}"
-    source_vault: "myvault{{ rpfx }}"
+    source_vault: myvault{{ rpfx }}
     key_url: "{{ key_url }}"
     state: present
     tags:
-      key1: "value1"
-  register: results
+      key1: value1
 
 - name: Assert that disk encryption set is updated
   ansible.builtin.assert:
     that: results.changed
 
 - name: Get disk encryption set facts
-  azure_rm_diskencryptionset_info:
+  register: results
+  azure.azcollection.azure_rm_diskencryptionset_info:
     resource_group: "{{ resource_group }}"
     name: "{{ set_name }}"
-  register: results
 
 - name: Assert the disk encryption facts
   ansible.builtin.assert:
@@ -112,29 +111,29 @@
       - results.diskencryptionsets[0].tags | length > 0
 
 - name: Delete disk encryption set
-  azure_rm_diskencryptionset:
+  register: results
+  azure.azcollection.azure_rm_diskencryptionset:
     resource_group: "{{ resource_group }}"
     name: "{{ set_name }}"
     state: absent
-  register: results
 
 - name: Assert that disk encryption set is deleted
   ansible.builtin.assert:
     that: results.changed
 
 - name: Delete disk encryption set (Idempotent test)
-  azure_rm_diskencryptionset:
+  register: results
+  azure.azcollection.azure_rm_diskencryptionset:
     resource_group: "{{ resource_group }}"
     name: "{{ set_name }}"
     state: absent
-  register: results
 
 - name: Asset that output is not changed
   ansible.builtin.assert:
     that: not results.changed
 
 - name: Delete the Key Vault
-  azure_rm_keyvault:
+  azure.azcollection.azure_rm_keyvault:
     resource_group: "{{ resource_group }}"
-    vault_name: "myvault{{ rpfx }}"
+    vault_name: myvault{{ rpfx }}
     state: absent
