@@ -1,15 +1,16 @@
+---
 - name: Prepare random number
   ansible.builtin.set_fact:
     rpfx: "{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
-    name_rpfx: "account{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
+    name_rpfx: account{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}
   run_once: true
 
 - name: Create automation account
-  azure_rm_automationaccount:
-    name: "{{ name_rpfx }}"
-    resource_group: "{{ resource_group }}"
   check_mode: true
   register: output
+  azure.azcollection.azure_rm_automationaccount:
+    name: "{{ name_rpfx }}"
+    resource_group: "{{ resource_group }}"
 
 - name: Check the check mode return
   ansible.builtin.assert:
@@ -17,10 +18,10 @@
       - output.changed
 
 - name: Create automation account
-  azure_rm_automationaccount:
+  register: output
+  azure.azcollection.azure_rm_automationaccount:
     name: "{{ name_rpfx }}"
     resource_group: "{{ resource_group }}"
-  register: output
 
 - name: Assert the account created
   ansible.builtin.assert:
@@ -29,10 +30,10 @@
       - output.id
 
 - name: Create automation account
-  azure_rm_automationaccount:
+  register: output
+  azure.azcollection.azure_rm_automationaccount:
     name: "{{ name_rpfx }}"
     resource_group: "{{ resource_group }}"
-  register: output
 
 - name: Assert the account already created
   ansible.builtin.assert:
@@ -40,13 +41,13 @@
       - not output.changed
 
 - name: Get automation account
-  azure_rm_automationaccount_info:
+  register: facts
+  azure.azcollection.azure_rm_automationaccount_info:
     name: "{{ name_rpfx }}"
     resource_group: "{{ resource_group }}"
     list_statistics: true
     list_usages: true
     list_keys: true
-  register: facts
 
 - name: Assert the account facts
   ansible.builtin.assert:
@@ -58,12 +59,12 @@
       - facts.automation_accounts[0].state == "Ok"
 
 - name: Delete account
-  azure_rm_automationaccount:
-    name: "{{ name_rpfx }}"
-    resource_group: "{{ resource_group }}"
-    state: absent
   check_mode: true
   register: output
+  azure.azcollection.azure_rm_automationaccount:
+    name: "{{ name_rpfx }}"
+    resource_group: "{{ resource_group }}"
+    state: absent
 
 - name: Assert the account deleted
   ansible.builtin.assert:
@@ -71,11 +72,11 @@
       - output.changed
 
 - name: Delete account
-  azure_rm_automationaccount:
+  register: output
+  azure.azcollection.azure_rm_automationaccount:
     name: "{{ name_rpfx }}"
     resource_group: "{{ resource_group }}"
     state: absent
-  register: output
 
 - name: Assert the account deleted
   ansible.builtin.assert:
@@ -83,11 +84,11 @@
       - output.changed
 
 - name: Delete account
-  azure_rm_automationaccount:
+  register: output
+  azure.azcollection.azure_rm_automationaccount:
     name: "{{ name_rpfx }}"
     resource_group: "{{ resource_group }}"
     state: absent
-  register: output
 
 - name: Assert the account delete
   ansible.builtin.assert:
