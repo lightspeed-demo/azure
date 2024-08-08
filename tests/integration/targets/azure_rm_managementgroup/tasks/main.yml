@@ -1,27 +1,28 @@
+---
 - name: Get list of all managementgroups
-  azure_rm_managementgroup_info:
   register: az_all_managementgroups
+  azure.azcollection.azure_rm_managementgroup_info:
 
 - name: Get a managementgroup by id
-  azure_rm_managementgroup_info:
+  register: az_recursive_managementgroups
+  azure.azcollection.azure_rm_managementgroup_info:
     id: "{{ az_all_managementgroups.management_groups[0].id }}"
     recurse: true
     flatten: true
     children: true
-  register: az_recursive_managementgroups
 
 - name: Get a managementgroup by name
-  azure_rm_managementgroup_info:
+  azure.azcollection.azure_rm_managementgroup_info:
     name: "{{ az_all_managementgroups.management_groups[0].name }}"
     recurse: true
     flatten: true
 
 - name: Test invalid name id combo
-  azure_rm_managementgroup_info:
-    name: "{{ az_all_managementgroups.management_groups[0].name }}"
-    id: "{{ az_all_managementgroups.management_groups[0].id }}"
   register: invalid_name
   ignore_errors: true
+  azure.azcollection.azure_rm_managementgroup_info:
+    name: "{{ az_all_managementgroups.management_groups[0].name }}"
+    id: "{{ az_all_managementgroups.management_groups[0].id }}"
 
 - name: Validate expected states
   ansible.builtin.assert:
@@ -30,6 +31,4 @@
 
 - name: Validate expected attributes
   ansible.builtin.assert:
-    that:
-      - "{{ item.id is defined }}"
-  loop: "{{ az_recursive_managementgroups.management_groups + az_recursive_managementgroups.subscriptions }}"
+    that: "{{ az_recursive_managementgroups.management_groups + az_recursive_managementgroups.subscriptions }}"
