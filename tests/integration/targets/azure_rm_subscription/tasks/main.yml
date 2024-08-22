@@ -1,24 +1,25 @@
+---
 - name: Get list of all subscriptions
-  azure_rm_subscription_info:
-    all: true
   register: az_all_subscriptions
+  azure.azcollection.azure_rm_subscription_info:
+    all: true
 
 - name: Get a subscription by id
-  azure_rm_subscription_info:
+  azure.azcollection.azure_rm_subscription_info:
     id: "{{ az_all_subscriptions.subscriptions[0].subscription_id }}"
 
 - name: Get a subscription by name
-  azure_rm_subscription_info:
+  azure.azcollection.azure_rm_subscription_info:
     name: "{{ az_all_subscriptions.subscriptions[0].display_name }}"
 
 - name: Test invalid name id combo
-  azure_rm_subscription_info:
-    name: "{{ az_all_subscriptions.subscriptions[0].display_name }}"
-    id: "{{ az_all_subscriptions.subscriptions[0].subscription_id }}"
   register: invalid_name
   ignore_errors: true
+  azure.azcollection.azure_rm_subscription_info:
+    name: "{{ az_all_subscriptions.subscriptions[0].display_name }}"
+    id: "{{ az_all_subscriptions.subscriptions[0].subscription_id }}"
 
 - name: Assert task failed
   ansible.builtin.assert:
     that:
-      - "invalid_name['failed'] == True"
+      - invalid_name['failed'] == True

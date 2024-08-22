@@ -1,13 +1,14 @@
+---
 - name: Prepare random number
   ansible.builtin.set_fact:
-    tmname: "tm{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
-    endpointname1: "ep1{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
-    endpointname2: "ep2{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
+    tmname: tm{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}
+    endpointname1: ep1{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}
+    endpointname2: ep2{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}
   run_once: true
 
-
 - name: Create a Traffic Manager profile(check mode)
-  azure_rm_trafficmanagerprofile:
+  check_mode: true
+  azure.azcollection.azure_rm_trafficmanagerprofile:
     resource_group: "{{ resource_group }}"
     name: "{{ tmname }}"
     tags:
@@ -23,20 +24,20 @@
     monitor_config:
       protocol: HTTPS
       port: 80
-      path: '/'
-  check_mode: true
+      path: /
 
 - name: Check there is no Traffic Manager profile created
-  azure_rm_trafficmanagerprofile_info:
+  register: fact
+  azure.azcollection.azure_rm_trafficmanagerprofile_info:
     resource_group: "{{ resource_group }}"
     name: "{{ tmname }}"
-  register: fact
 
 - name: Check there is no Traffic Manager profile created
   ansible.builtin.assert: { that: "{{ fact.tms | length }} == 0" }
 
 - name: Create a Traffic Manager profile
-  azure_rm_trafficmanagerprofile:
+  register: tm
+  azure.azcollection.azure_rm_trafficmanagerprofile:
     resource_group: "{{ resource_group }}"
     name: "{{ tmname }}"
     tags:
@@ -52,8 +53,7 @@
     monitor_config:
       protocol: HTTPS
       port: 80
-      path: '/'
-  register: tm
+      path: /
 
 - name: Assert the Traffic Manager profile is well created
   ansible.builtin.assert:
@@ -61,20 +61,21 @@
       - tm.changed
 
 - name: Gather Traffic Manager profile facts
-  azure_rm_trafficmanagerprofile_info:
+  register: fact
+  azure.azcollection.azure_rm_trafficmanagerprofile_info:
     resource_group: "{{ resource_group }}"
     name: "{{ tmname }}"
-  register: fact
 
 - name: Assert fact returns the created one
   ansible.builtin.assert:
     that:
-      - "fact.tms | length == 1"
+      - fact.tms | length == 1
       - fact.tms[0].id == tm.id
       - fact.tms[0].endpoints | length == 0
 
 - name: Create a Traffic Manager profile (idempotent)
-  azure_rm_trafficmanagerprofile:
+  register: output
+  azure.azcollection.azure_rm_trafficmanagerprofile:
     resource_group: "{{ resource_group }}"
     name: "{{ tmname }}"
     tags:
@@ -90,8 +91,7 @@
     monitor_config:
       protocol: HTTPS
       port: 80
-      path: '/'
-  register: output
+      path: /
 
 - name: Assert idempotent
   ansible.builtin.assert:
@@ -99,7 +99,8 @@
       - not output.changed
 
 - name: Update the Traffic Manager profile
-  azure_rm_trafficmanagerprofile:
+  register: output
+  azure.azcollection.azure_rm_trafficmanagerprofile:
     resource_group: "{{ resource_group }}"
     name: "{{ tmname }}"
     tags:
@@ -115,8 +116,7 @@
     monitor_config:
       protocol: HTTPS
       port: 80
-      path: '/'
-  register: output
+      path: /
 
 - name: Assert the Traffic Manager profile is updated
   ansible.builtin.assert:
@@ -124,7 +124,9 @@
       - output.changed
 
 - name: Create Traffic Manager endpoint(check mode)
-  azure_rm_trafficmanagerendpoint:
+  check_mode: true
+  register: output
+  azure.azcollection.azure_rm_trafficmanagerendpoint:
     resource_group: "{{ resource_group }}"
     profile_name: "{{ tmname }}"
     name: "{{ endpointname1 }}"
@@ -133,8 +135,6 @@
     priority: 2
     weight: 1
     target: 1.2.3.4
-  check_mode: true
-  register: output
 
 - name: Assert check mode changed
   ansible.builtin.assert:
@@ -142,10 +142,10 @@
       - output.changed
 
 - name: Get endpoint
-  azure_rm_trafficmanagerendpoint_info:
+  register: facts
+  azure.azcollection.azure_rm_trafficmanagerendpoint_info:
     resource_group: "{{ resource_group }}"
     profile_name: "{{ tmname }}"
-  register: facts
 
 - name: Check no endpoint created in check mode
   ansible.builtin.assert:
@@ -153,7 +153,8 @@
       - facts.endpoints | length == 0
 
 - name: Create Traffic Manager endpoint
-  azure_rm_trafficmanagerendpoint:
+  register: output
+  azure.azcollection.azure_rm_trafficmanagerendpoint:
     resource_group: "{{ resource_group }}"
     profile_name: "{{ tmname }}"
     name: "{{ endpointname1 }}"
@@ -162,7 +163,6 @@
     priority: 2
     weight: 1
     target: 1.2.3.4
-  register: output
 
 - name: Assert endpoint create changed
   ansible.builtin.assert:
@@ -170,10 +170,10 @@
       - output.changed
 
 - name: Get endpoint
-  azure_rm_trafficmanagerendpoint_info:
+  register: facts
+  azure.azcollection.azure_rm_trafficmanagerendpoint_info:
     resource_group: "{{ resource_group }}"
     profile_name: "{{ tmname }}"
-  register: facts
 
 - name: Check endpoint created
   ansible.builtin.assert:
@@ -182,7 +182,7 @@
       - facts.endpoints[0].name == "{{ endpointname1 }}"
 
 - name: Create second Traffic Manager endpoint
-  azure_rm_trafficmanagerendpoint:
+  azure.azcollection.azure_rm_trafficmanagerendpoint:
     resource_group: "{{ resource_group }}"
     profile_name: "{{ tmname }}"
     name: "{{ endpointname2 }}"
@@ -193,10 +193,10 @@
     target: 4.3.2.1
 
 - name: Get endpoint
-  azure_rm_trafficmanagerendpoint_info:
+  register: facts
+  azure.azcollection.azure_rm_trafficmanagerendpoint_info:
     resource_group: "{{ resource_group }}"
     profile_name: "{{ tmname }}"
-  register: facts
 
 - name: Check 2 endpoint in profile
   ansible.builtin.assert:
@@ -204,7 +204,8 @@
       - facts.endpoints | length == 2
 
 - name: Create endpoint (idempotent)
-  azure_rm_trafficmanagerendpoint:
+  register: output
+  azure.azcollection.azure_rm_trafficmanagerendpoint:
     resource_group: "{{ resource_group }}"
     profile_name: "{{ tmname }}"
     name: "{{ endpointname2 }}"
@@ -213,7 +214,6 @@
     priority: 1
     weight: 3
     target: 4.3.2.1
-  register: output
 
 - name: Assert endpoint creation idempotent
   ansible.builtin.assert:
@@ -221,13 +221,13 @@
       - output.changed == False
 
 - name: Delete second endpoint
-  azure_rm_trafficmanagerendpoint:
+  register: output
+  azure.azcollection.azure_rm_trafficmanagerendpoint:
     resource_group: "{{ resource_group }}"
     profile_name: "{{ tmname }}"
     name: "{{ endpointname2 }}"
     type: external_endpoints
     state: absent
-  register: output
 
 - name: Assert endpoint deletion changed
   ansible.builtin.assert:
@@ -235,10 +235,10 @@
       - output.changed
 
 - name: Get endpoint
-  azure_rm_trafficmanagerendpoint_info:
+  register: facts
+  azure.azcollection.azure_rm_trafficmanagerendpoint_info:
     resource_group: "{{ resource_group }}"
     profile_name: "{{ tmname }}"
-  register: facts
 
 - name: Check 1 endpoint left in profile
   ansible.builtin.assert:
@@ -246,31 +246,31 @@
       - facts.endpoints | length == 1
 
 - name: Delete the Traffic Manager profile(check mode)
-  azure_rm_trafficmanagerprofile:
+  check_mode: true
+  azure.azcollection.azure_rm_trafficmanagerprofile:
     resource_group: "{{ resource_group }}"
     name: "{{ tmname }}"
     state: absent
-  check_mode: true
 
 - name: Gather Traffic Manager profile facts
-  azure_rm_trafficmanagerprofile_info:
+  register: fact
+  azure.azcollection.azure_rm_trafficmanagerprofile_info:
     resource_group: "{{ resource_group }}"
     name: "{{ tmname }}"
-  register: fact
 
 - name: Assert the traffic manager profile is still there
   ansible.builtin.assert:
     that:
-      - "fact.tms | length == 1"
+      - fact.tms | length == 1
       - fact.tms[0].id == tm.id
       - fact.tms[0].endpoints | length == 1
 
 - name: Delete the Traffic Manager profile
-  azure_rm_trafficmanagerprofile:
+  register: output
+  azure.azcollection.azure_rm_trafficmanagerprofile:
     resource_group: "{{ resource_group }}"
     name: "{{ tmname }}"
     state: absent
-  register: output
 
 - name: Assert the Traffic Manager profile is well deleted
   ansible.builtin.assert:
@@ -278,12 +278,12 @@
       - output.changed
 
 - name: Get Traffic Manager profile fact
-  azure_rm_trafficmanagerprofile_info:
+  register: fact
+  azure.azcollection.azure_rm_trafficmanagerprofile_info:
     resource_group: "{{ resource_group }}"
     name: "{{ tmname }}"
-  register: fact
 
 - name: Assert fact returns empty
   ansible.builtin.assert:
     that:
-      - "fact.tms | length == 0"
+      - fact.tms | length == 0
