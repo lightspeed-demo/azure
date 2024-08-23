@@ -1,30 +1,31 @@
+---
 - name: Prepare random number
   ansible.builtin.set_fact:
     rpfx: "{{ resource_group | hash('md5') | truncate(10, True, '') }}"
   run_once: true
 
 - name: Create automation account
-  azure_rm_automationaccount:
-    name: "account-{{ rpfx }}"
+  azure.azcollection.azure_rm_automationaccount:
+    name: account-{{ rpfx }}
     resource_group: "{{ resource_group }}"
 
 - name: Create automation runbook (check mode)
-  azure_rm_automationrunbook:
-    resource_group: "{{ resource_group }}"
-    automation_account_name: "account-{{ rpfx }}"
-    name: "runbook-{{ rpfx }}"
-    runbook_type: "Script"
-    description: "Fred test"
   check_mode: true
+  azure.azcollection.azure_rm_automationrunbook:
+    resource_group: "{{ resource_group }}"
+    automation_account_name: account-{{ rpfx }}
+    name: runbook-{{ rpfx }}
+    runbook_type: Script
+    description: Fred test
 
 - name: Create automation runbook with default parameters
-  azure_rm_automationrunbook:
-    resource_group: "{{ resource_group }}"
-    automation_account_name: "account-{{ rpfx }}"
-    name: "runbook-{{ rpfx }}"
-    runbook_type: "Script"
-    description: "Fred test"
   register: output
+  azure.azcollection.azure_rm_automationrunbook:
+    resource_group: "{{ resource_group }}"
+    automation_account_name: account-{{ rpfx }}
+    name: runbook-{{ rpfx }}
+    runbook_type: Script
+    description: Fred test
 
 - name: Assert the automation runbook is well created
   ansible.builtin.assert:
@@ -32,13 +33,13 @@
       - output.changed
 
 - name: Create automation runbook with default parameters (idempotent)
-  azure_rm_automationrunbook:
-    resource_group: "{{ resource_group }}"
-    automation_account_name: "account-{{ rpfx }}"
-    name: "runbook-{{ rpfx }}"
-    runbook_type: "Script"
-    description: "Fred test"
   register: output
+  azure.azcollection.azure_rm_automationrunbook:
+    resource_group: "{{ resource_group }}"
+    automation_account_name: account-{{ rpfx }}
+    name: runbook-{{ rpfx }}
+    runbook_type: Script
+    description: Fred test
 
 - name: Assert the automation runbook is well created
   ansible.builtin.assert:
@@ -46,18 +47,18 @@
       - not output.changed
 
 - name: Create automation runbook with more paramters
-  azure_rm_automationrunbook:
+  register: output
+  azure.azcollection.azure_rm_automationrunbook:
     resource_group: "{{ resource_group }}"
-    automation_account_name: "account-{{ rpfx }}"
-    name: "runbook-{{ rpfx }}-secondary"
-    runbook_type: "Script"
-    description: "test"
+    automation_account_name: account-{{ rpfx }}
+    name: runbook-{{ rpfx }}-secondary
+    runbook_type: Script
+    description: test
     log_activity_trace: 2
     log_progress: false
     log_verbose: true
     tags:
       key1: value1
-  register: output
 
 - name: Assert the automation runbook is well created
   ansible.builtin.assert:
@@ -65,18 +66,18 @@
       - output.changed
 
 - name: Update automation runbook with more paramters
-  azure_rm_automationrunbook:
+  register: output
+  azure.azcollection.azure_rm_automationrunbook:
     resource_group: "{{ resource_group }}"
-    automation_account_name: "account-{{ rpfx }}"
-    name: "runbook-{{ rpfx }}-secondary"
-    runbook_type: "Script"
-    description: "update"
+    automation_account_name: account-{{ rpfx }}
+    name: runbook-{{ rpfx }}-secondary
+    runbook_type: Script
+    description: update
     log_activity_trace: 3
     log_progress: true
     log_verbose: false
     tags:
       key2: value2
-  register: output
 
 - name: Assert the automation runbook is well created
   ansible.builtin.assert:
@@ -84,12 +85,12 @@
       - output.changed
 
 - name: Publish automation runbook
-  azure_rm_automationrunbook:
-    resource_group: "{{ resource_group }}"
-    automation_account_name: "account-{{ rpfx }}"
-    name: "runbook-{{ rpfx }}-secondary"
-    publish: true
   register: output
+  azure.azcollection.azure_rm_automationrunbook:
+    resource_group: "{{ resource_group }}"
+    automation_account_name: account-{{ rpfx }}
+    name: runbook-{{ rpfx }}-secondary
+    publish: true
 
 - name: Assert the automation runbook is well published
   ansible.builtin.assert:
@@ -97,11 +98,11 @@
       - output.changed
 
 - name: Get automation runbook
-  azure_rm_automationrunbook_info:
-    resource_group: "{{ resource_group }}"
-    automation_account_name: "account-{{ rpfx }}"
-    name: "runbook-{{ rpfx }}-secondary"
   register: output
+  azure.azcollection.azure_rm_automationrunbook_info:
+    resource_group: "{{ resource_group }}"
+    automation_account_name: account-{{ rpfx }}
+    name: runbook-{{ rpfx }}-secondary
 
 - name: Assert the automation runbook is well created
   ansible.builtin.assert:
@@ -114,10 +115,10 @@
       - output.automation_runbook[0].state == 'Published'
 
 - name: Get all automation runbook
-  azure_rm_automationrunbook_info:
-    resource_group: "{{ resource_group }}"
-    automation_account_name: "account-{{ rpfx }}"
   register: output
+  azure.azcollection.azure_rm_automationrunbook_info:
+    resource_group: "{{ resource_group }}"
+    automation_account_name: account-{{ rpfx }}
 
 - name: Assert the automation runbook is well created
   ansible.builtin.assert:
@@ -125,15 +126,15 @@
       - output.automation_runbook | length == 2
 
 - name: Delete automation runbook
-  azure_rm_automationrunbook:
+  azure.azcollection.azure_rm_automationrunbook:
     resource_group: "{{ resource_group }}"
-    automation_account_name: "account-{{ rpfx }}"
-    name: "runbook-{{ rpfx }}"
+    automation_account_name: account-{{ rpfx }}
+    name: runbook-{{ rpfx }}
     state: absent
 
 - name: Delete automation runbook
-  azure_rm_automationrunbook:
+  azure.azcollection.azure_rm_automationrunbook:
     resource_group: "{{ resource_group }}"
-    automation_account_name: "account-{{ rpfx }}"
-    name: "runbook-{{ rpfx }}-secondary"
+    automation_account_name: account-{{ rpfx }}
+    name: runbook-{{ rpfx }}-secondary
     state: absent
