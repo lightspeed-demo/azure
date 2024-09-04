@@ -1,9 +1,10 @@
+---
 - name: Set storage account name
   ansible.builtin.set_fact:
-    storage_account: "sb{{ resource_group | hash('md5') | truncate(22, True, '') }}"
+    storage_account: sb{{ resource_group | hash('md5') | truncate(22, True, '') }}
 
 - name: Create storage account
-  azure_rm_storageaccount:
+  azure.azcollection.azure_rm_storageaccount:
     resource_group: "{{ resource_group }}"
     name: "{{ storage_account }}"
     account_type: Standard_LRS
@@ -19,14 +20,14 @@
       purpose: test
 
 - name: Create share
-  azure_rm_storageshare:
+  register: create_result
+  azure.azcollection.azure_rm_storageshare:
     name: "{{ share_name }}"
     resource_group: "{{ resource_group }}"
     account_name: "{{ storage_account }}"
     quota: "{{ quota }}"
     metadata: "{{ metadata }}"
     access_tier: "{{ access_tier }}"
-  register: create_result
 
 - name: Assert create success
   ansible.builtin.assert:
@@ -41,22 +42,22 @@
       - create_result.state.etag is defined
 
 - name: Run again to check idempotence
-  azure_rm_storageshare:
+  register: create_result
+  azure.azcollection.azure_rm_storageshare:
     name: "{{ share_name }}"
     resource_group: "{{ resource_group }}"
     account_name: "{{ storage_account }}"
-  register: create_result
 
 - name: Assert idempotence
   ansible.builtin.assert:
     that: not create_result.changed
 
 - name: Get share details
-  azure_rm_storageshare_info:
+  register: share_facts
+  azure.azcollection.azure_rm_storageshare_info:
     name: "{{ share_name }}"
     resource_group: "{{ resource_group }}"
     account_name: "{{ storage_account }}"
-  register: share_facts
 
 - name: Assert storage share details
   ansible.builtin.assert:
@@ -76,24 +77,24 @@
     access_tier: Hot
 
 - name: Update share
-  azure_rm_storageshare:
+  register: update_result
+  azure.azcollection.azure_rm_storageshare:
     name: "{{ share_name }}"
     resource_group: "{{ resource_group }}"
     account_name: "{{ storage_account }}"
     quota: "{{ quota }}"
     access_tier: "{{ access_tier }}"
-  register: update_result
 
 - name: Assert share update success
   ansible.builtin.assert:
     that: update_result.changed
 
 - name: Get updated details
-  azure_rm_storageshare_info:
+  register: share_facts
+  azure.azcollection.azure_rm_storageshare_info:
     name: "{{ share_name }}"
     resource_group: "{{ resource_group }}"
     account_name: "{{ storage_account }}"
-  register: share_facts
 
 - name: Assert storage share details
   ansible.builtin.assert:
@@ -107,12 +108,12 @@
       - share_facts.storageshares.etag is defined
 
 - name: Delete share
-  azure_rm_storageshare:
+  register: delete_output
+  azure.azcollection.azure_rm_storageshare:
     name: "{{ share_name }}"
     resource_group: "{{ resource_group }}"
     account_name: "{{ storage_account }}"
     state: absent
-  register: delete_output
 
 - name: Pause for 3 minutes to waiting delete
   ansible.builtin.pause:
@@ -120,7 +121,7 @@
   changed_when: true
 
 - name: Delete storage account
-  azure_rm_storageaccount:
+  azure.azcollection.azure_rm_storageaccount:
     resource_group: "{{ resource_group }}"
     name: "{{ storage_account }}"
     state: absent
