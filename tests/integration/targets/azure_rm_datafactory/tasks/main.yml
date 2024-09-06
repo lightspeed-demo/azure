@@ -1,24 +1,25 @@
+---
 - name: Create data factory name
   ansible.builtin.set_fact:
-    name_rpfx: "df{{ resource_group | hash('md5') | truncate(21, True, '') }}"
+    name_rpfx: df{{ resource_group | hash('md5') | truncate(21, True, '') }}
 
 - name: Create data factory (Checkmode)
-  azure_rm_datafactory:
+  check_mode: true
+  azure.azcollection.azure_rm_datafactory:
     resource_group: "{{ resource_group }}"
     name: "{{ name_rpfx }}"
     public_network_access: Enabled
     tags:
       key1: value1
-  check_mode: true
 
 - name: Create data factory
-  azure_rm_datafactory:
+  register: output
+  azure.azcollection.azure_rm_datafactory:
     resource_group: "{{ resource_group }}"
     name: "{{ name_rpfx }}"
     public_network_access: Enabled
     tags:
       key1: value1
-  register: output
 
 - name: Assert the data factory created
   ansible.builtin.assert:
@@ -26,13 +27,13 @@
       - output.changed
 
 - name: Create data factory again (Idempotent test)
-  azure_rm_datafactory:
+  register: output
+  azure.azcollection.azure_rm_datafactory:
     resource_group: "{{ resource_group }}"
     name: "{{ name_rpfx }}"
     public_network_access: Enabled
     tags:
       key1: value1
-  register: output
 
 - name: Assert the idempotent success
   ansible.builtin.assert:
@@ -40,14 +41,14 @@
       - not output.changed
 
 - name: Update data factory
-  azure_rm_datafactory:
+  register: output
+  azure.azcollection.azure_rm_datafactory:
     resource_group: "{{ resource_group }}"
     name: "{{ name_rpfx }}"
     public_network_access: Disabled
     tags:
       key1: value1
       key2: value2
-  register: output
 
 - name: Assert the data factory updated
   ansible.builtin.assert:
@@ -55,10 +56,10 @@
       - output.changed
 
 - name: Get data factory info
-  azure_rm_datafactory_info:
+  register: output
+  azure.azcollection.azure_rm_datafactory_info:
     resource_group: "{{ resource_group }}"
     name: "{{ name_rpfx }}"
-  register: output
 
 - name: Assert status succeed and result match expectations
   ansible.builtin.assert:
@@ -67,11 +68,11 @@
       - output.datafactory[0].public_network_access == 'Disabled'
 
 - name: Delete data factory
-  azure_rm_datafactory:
+  register: output
+  azure.azcollection.azure_rm_datafactory:
     resource_group: "{{ resource_group }}"
     name: "{{ name_rpfx }}"
     state: absent
-  register: output
 
 - name: Assert the data factory deleted
   ansible.builtin.assert:
