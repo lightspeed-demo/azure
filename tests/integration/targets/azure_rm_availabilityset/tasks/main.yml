@@ -1,23 +1,24 @@
+---
 - name: Create an availability set with default options - Check Mode
-  azure_rm_availabilityset:
+  register: results
+  check_mode: true
+  azure.azcollection.azure_rm_availabilityset:
     name: myavailabilityset1
     resource_group: "{{ resource_group }}"
     tags:
       tag1: testtag
-  register: results
-  check_mode: true
 
 - name: Assert the availability created
   ansible.builtin.assert:
     that: results.changed
 
 - name: Create an availability set with default options
-  azure_rm_availabilityset:
+  register: results
+  azure.azcollection.azure_rm_availabilityset:
     name: myavailabilityset1
     resource_group: "{{ resource_group }}"
     tags:
       tag1: testtag
-  register: results
 
 - name: Assert the availability created
   ansible.builtin.assert:
@@ -25,40 +26,40 @@
 
 - name: Create proximity placement group name
   ansible.builtin.set_fact:
-    ppgroup_name: "ppg{{ resource_group | hash('md5') | truncate(22, True, '') }}"
+    ppgroup_name: ppg{{ resource_group | hash('md5') | truncate(22, True, '') }}
 
 - name: Create a proximity placement group
-  azure_rm_proximityplacementgroup:
+  register: results
+  azure.azcollection.azure_rm_proximityplacementgroup:
     resource_group: "{{ resource_group }}"
     location: eastus
     name: "{{ ppgroup_name }}"
     state: present
-  register: results
 
 - name: Create an availability set with advanced options
-  azure_rm_availabilityset:
+  register: results
+  azure.azcollection.azure_rm_availabilityset:
     name: myavailabilityset2
     resource_group: "{{ resource_group }}"
     platform_update_domain_count: 5
     platform_fault_domain_count: 2
     proximity_placement_group: "{{ ppgroup_name }}"
     sku: Aligned
-  register: results
 
 - name: Assert the availability set created
   ansible.builtin.assert:
     that: results.changed
 
 - name: Modify availabilty set immutable options - no changes, fail for immutable options
-  azure_rm_availabilityset:
+  register: results
+  ignore_errors: true
+  azure.azcollection.azure_rm_availabilityset:
     name: myavailabilityset2
     resource_group: "{{ resource_group }}"
     platform_update_domain_count: 2
     platform_fault_domain_count: 2
     proximity_placement_group: "{{ ppgroup_name }}"
     sku: Aligned
-  register: results
-  ignore_errors: true
 
 - name: Assert availabilty set modified
   ansible.builtin.assert:
@@ -67,7 +68,9 @@
       - results.msg == 'You tried to change platform_update_domain_count but is was unsuccessful. An Availability Set is immutable, except tags'
 
 - name: Modify availabilty set immutable options and set tags - change tags and fail for immutable options
-  azure_rm_availabilityset:
+  register: results
+  ignore_errors: true
+  azure.azcollection.azure_rm_availabilityset:
     name: myavailabilityset2
     resource_group: "{{ resource_group }}"
     platform_update_domain_count: 2
@@ -76,8 +79,6 @@
     sku: Aligned
     tags:
       test1: modified
-  register: results
-  ignore_errors: true
 
 - name: Assert the availabilty set idempotent
   ansible.builtin.assert:
@@ -86,7 +87,8 @@
       - results.msg == 'You tried to change platform_update_domain_count but is was unsuccessful. An Availability Set is immutable, except tags'
 
 - name: Modify availabilty set options to update tags
-  azure_rm_availabilityset:
+  register: results
+  azure.azcollection.azure_rm_availabilityset:
     name: myavailabilityset2
     resource_group: "{{ resource_group }}"
     platform_update_domain_count: 5
@@ -95,7 +97,6 @@
     sku: Aligned
     tags:
       test2: modified
-  register: results
 
 - name: Assert availabilty set updated
   ansible.builtin.assert:
@@ -103,21 +104,22 @@
       - results.state.tags.test2 == 'modified'
 
 - name: Create availability set with incorrect fault domain parameter
-  azure_rm_availabilityset:
+  register: results
+  ignore_errors: true
+  azure.azcollection.azure_rm_availabilityset:
     name: myavailabilityset3
     resource_group: "{{ resource_group }}"
     platform_update_domain_count: 5
     platform_fault_domain_count: 4
     sku: Aligned
-  register: results
-  ignore_errors: true
 
 - name: Assert the error return
-  ansible.builtin.assert:
-    { that: "'The specified fault domain count 4 must fall in the range 1 to' in results['msg']" }
+  ansible.builtin.assert: { that: "'The specified fault domain count 4 must fall in the range 1 to' in results['msg']" }
 
 - name: Test check_mode
-  azure_rm_availabilityset:
+  check_mode: true
+  register: results
+  azure.azcollection.azure_rm_availabilityset:
     name: myavailabilityset2
     resource_group: "{{ resource_group }}"
     platform_update_domain_count: 5
@@ -127,8 +129,6 @@
     tags:
       checktest1: modified1
       checktest2: modified2
-  check_mode: true
-  register: results
 
 - name: Assert the check mode test
   ansible.builtin.assert:
@@ -138,12 +138,12 @@
 
 #
 # azure_rm_availabilityset_facts tests
-#
+
 - name: Get facts for created availability set
-  azure_rm_availabilityset_info:
+  register: results
+  azure.azcollection.azure_rm_availabilityset_info:
     name: myavailabilityset2
     resource_group: "{{ resource_group }}"
-  register: results
 
 - name: Assert the availabilty set facts
   ansible.builtin.assert:
@@ -156,49 +156,47 @@
       - results.ansible_info.azure_availabilitysets[0].proximity_placement_group.id.split('/')[-1] == ppgroup_name
 
 - name: Delete an availability set - Check Mode
-  azure_rm_availabilityset:
+  check_mode: true
+  azure.azcollection.azure_rm_availabilityset:
     name: myavailabilityset1
     resource_group: "{{ resource_group }}"
-    state: absent
-  check_mode: true
-  register: results
+
 - name: Assert the availabilty set deleted
   ansible.builtin.assert:
     that:
       - results.changed
 
 - name: Delete an availability set
-  azure_rm_availabilityset:
+  azure.azcollection.azure_rm_availabilityset:
     name: myavailabilityset1
     resource_group: "{{ resource_group }}"
     state: absent
 
 - name: Delete an availability set already deleted - Check Mode
-  azure_rm_availabilityset:
+  check_mode: true
+  azure.azcollection.azure_rm_availabilityset:
     name: myavailabilityset1
     resource_group: "{{ resource_group }}"
-    state: absent
-  check_mode: true
-  register: results
+
 - name: Assert check mode return
   ansible.builtin.assert:
     that:
       - not results.changed
 
 - name: Delete an availability set
-  azure_rm_availabilityset:
+  azure.azcollection.azure_rm_availabilityset:
     name: myavailabilityset2
     resource_group: "{{ resource_group }}"
     state: absent
 
 - name: Delete an availability set
-  azure_rm_availabilityset:
+  azure.azcollection.azure_rm_availabilityset:
     name: myavailabilityset3
     resource_group: "{{ resource_group }}"
     state: absent
 
 - name: Delete proximity placement group
-  azure_rm_proximityplacementgroup:
+  azure.azcollection.azure_rm_proximityplacementgroup:
     resource_group: "{{ resource_group }}"
     name: "{{ ppgroup_name }}"
     state: absent
