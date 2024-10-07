@@ -1,3 +1,4 @@
+---
 - name: Create random domain name
   ansible.builtin.set_fact:
     domain_name: "{{ resource_group | hash('md5') | truncate(16, True, '') + (65535 | random | string) }}"
@@ -141,7 +142,7 @@
 - name: Create SRV records in a new record set
   azure_rm_dnsrecordset:
     resource_group: "{{ resource_group }}"
-    relative_name: "_sip._tcp.{{ domain_name }}.com"
+    relative_name: _sip._tcp.{{ domain_name }}.com
     zone_name: "{{ domain_name }}.com"
     time_to_live: 7200
     record_type: SRV
@@ -161,16 +162,16 @@
 - name: Create TXT records in a new record set
   azure_rm_dnsrecordset:
     resource_group: "{{ resource_group }}"
-    relative_name: "_txt.{{ domain_name }}.com"
+    relative_name: _txt.{{ domain_name }}.com
     zone_name: "{{ domain_name }}.com"
     record_type: TXT
     state: present
     records:
-      - entry: "v=spf1 a -all"
-      - entry: "foo"
+      - entry: v=spf1 a -all
+      - entry: foo
       - entry:
-          - "bar"
-          - "baz"
+          - bar
+          - baz
   register: results
 
 - name: Assert that TXT record set was created
