@@ -1,9 +1,10 @@
+---
 - name: Prepare random number
   ansible.builtin.set_fact:
-    secgroupname: "sg{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
-    asg_name1: "asg1{{ resource_group | hash('md5') | truncate(7, True, '') }}"
-    asg_name2: "asg2{{ resource_group | hash('md5') | truncate(7, True, '') }}"
-    sg_name1: "sgasg{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
+    secgroupname: sg{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}
+    asg_name1: asg1{{ resource_group | hash('md5') | truncate(7, True, '') }}
+    asg_name2: asg2{{ resource_group | hash('md5') | truncate(7, True, '') }}
+    sg_name1: sgasg{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}
   run_once: true
 
 - name: Create security group
@@ -264,7 +265,7 @@
         securityRules:
           - name: Upper_Protocal
             properties:
-              protocol: TCP  # UPPERCASE
+              protocol: TCP # UPPERCASE
               access: Allow
               sourceAddressPrefix: "*"
               sourcePortRange: "*"
@@ -279,7 +280,7 @@
     name: "{{ secgroupname }}"
     rules:
       - name: Upper_Protocal
-        protocol: Tcp     # Capitalized
+        protocol: Tcp # Capitalized
         access: Allow
         destination_port_range: 80
         priority: 100
