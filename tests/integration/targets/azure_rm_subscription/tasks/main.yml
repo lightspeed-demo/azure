@@ -1,3 +1,4 @@
+---
 - name: Get list of all subscriptions
   azure_rm_subscription_info:
     all: true
@@ -21,4 +22,4 @@
 - name: Assert task failed
   ansible.builtin.assert:
     that:
-      - "invalid_name['failed'] == True"
+      - invalid_name['failed'] == True
