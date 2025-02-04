@@ -1,6 +1,7 @@
+---
 - name: Prepare random number
   ansible.builtin.set_fact:
-    random_postfix: "sqlmi{{ 1000 | random }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
+    random_postfix: sqlmi{{ 1000 | random }}{{ resource_group | hash('md5') | truncate(7, True, '') }}
 
 - name: Create virtual network
   azure_rm_virtualnetwork:
@@ -50,7 +51,7 @@
     name: foobar
     virtual_network_name: "{{ random_postfix }}"
     resource_group: "{{ resource_group }}"
-    address_prefix_cidr: "10.1.0.0/24"
+    address_prefix_cidr: 10.1.0.0/24
     security_group:
       resource_gorup: "{{ resource_group }}"
       name: "{{ random_postfix }}"
@@ -58,8 +59,8 @@
       name: "{{ random_postfix }}"
       resource_group: "{{ resource_group }}"
     delegations:
-      - name: 'mysqlinstance'
-        serviceName: "Microsoft.Sql/managedInstances"
+      - name: mysqlinstance
+        serviceName: Microsoft.Sql/managedInstances
   register: subnet_output
 
 - name: Create sql managed instance (Checkmode test)
