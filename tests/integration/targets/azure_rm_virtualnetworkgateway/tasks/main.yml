@@ -1,10 +1,11 @@
+---
 # FIXME: needs minimal tests (check mode?) that can run quickly, VNG creation takes > 20min
 
 - name: Prepare random number
   ansible.builtin.set_fact:
-    vnetname: "vnet{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
-    vngname: "vng{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
-    pubipname: "testPublicIP{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
+    vnetname: vnet{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}
+    vngname: vng{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}
+    pubipname: testPublicIP{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}
 
 - name: Create virtual network gateway without bgp settings (check mode)
   check_mode: true
@@ -17,7 +18,7 @@
         public_ip_address_name: "{{ pubipname }}"
     virtual_network: "{{ vnetname }}"
     tags:
-      common: "xyz"
+      common: xyz
   register: output
 
 - name: Assert the virtual network gateway check mode
@@ -37,7 +38,7 @@
         public_ip_address_name: "{{ pubipname }}"
     virtual_network: "{{ vnetname }}"
     tags:
-      common: "xyz"
+      common: xyz
 
 - name: Assert the virtual network gateway check mode
   ansible.builtin.assert:
@@ -50,13 +51,13 @@
       azure_rm_virtualnetwork:
         resource_group: "{{ resource_group }}"
         name: "{{ vnetname }}"
-        address_prefixes: "10.0.0.0/16"
+        address_prefixes: 10.0.0.0/16
 
     - name: Add subnet
       azure_rm_subnet:
         resource_group: "{{ resource_group }}"
         name: GatewaySubnet
-        address_prefix: "10.0.2.0/24"
+        address_prefix: 10.0.2.0/24
         virtual_network: "{{ vnetname }}"
 
     - name: Create public IP address
@@ -75,7 +76,7 @@
             public_ip_address_name: testPublicIP
         virtual_network: "{{ vnetname }}"
         tags:
-          common: "xyz"
+          common: xyz
       register: output
 
     - name: Assert the virtual network gateway created
@@ -92,7 +93,7 @@
             public_ip_address_name: "{{ pubipname }}"
         virtual_network: "{{ vnetname }}"
         tags:
-          common: "xyz"
+          common: xyz
       register: output
 
     - name: Assert the idempotent
@@ -109,7 +110,7 @@
             public_ip_address_name: "{{ pubipname }}"
         virtual_network: "{{ vnetname }}"
         tags:
-          common: "mno"
+          common: mno
       register: output
     - name: Assert the virtual network gateway updated
       ansible.builtin.assert:
@@ -132,13 +133,13 @@
       azure_rm_virtualnetwork:
         resource_group: "{{ resource_group }}"
         name: "{{ vnetname }}"
-        address_prefixes: "10.0.0.0/16"
+        address_prefixes: 10.0.0.0/16
 
     - name: Add subnet
       azure_rm_subnet:
         resource_group: "{{ resource_group }}"
         name: GatewaySubnet
-        address_prefix: "10.0.2.0/24"
+        address_prefix: 10.0.2.0/24
         virtual_network: "{{ vnetname }}"
 
     - name: Create public IP address
@@ -159,7 +160,7 @@
             public_ip_address_name: "{{ pubipname }}"
         virtual_network: "{{ vnetname }}"
         tags:
-          common: "xyz"
+          common: xyz
 
     - name: Assert the virtual network gateay created
       ansible.builtin.assert:
@@ -177,7 +178,7 @@
             public_ip_address_name: "{{ pubipname }}"
         virtual_network: "{{ vnetname }}"
         tags:
-          common: "mno"
+          common: mno
       register: output
     - name: Assert the virtual network gateway updated
       ansible.builtin.assert:
