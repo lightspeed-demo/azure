@@ -1,6 +1,7 @@
+---
 - name: Create random express route
   ansible.builtin.set_fact:
-    express_route: "test{{ resource_group | hash('md5') | truncate(16, True, '') + (65535 | random | string) }}"
+    express_route: test{{ resource_group | hash('md5') | truncate(16, True, '') + (65535 | random | string) }}
 
 - name: Create Express route (check mode)
   azure_rm_expressroute:
@@ -16,7 +17,7 @@
     service_provider_properties:
       service_provider_name: Aryaka Networks
       peering_location: Seattle
-      bandwidth_in_mbps: '200'
+      bandwidth_in_mbps: "200"
     sku:
       tier: premium
       family: metereddata
@@ -26,7 +27,6 @@
 - name: Assert the excpress route check mode result
   ansible.builtin.assert:
     that: results.changed
-
 
 - name: Create Express route
   azure_rm_expressroute:
@@ -42,7 +42,7 @@
     service_provider_properties:
       service_provider_name: Aryaka Networks
       peering_location: Seattle
-      bandwidth_in_mbps: '200'
+      bandwidth_in_mbps: "200"
     sku:
       tier: premium
       family: metereddata
@@ -51,7 +51,6 @@
 - name: Assert the express route created
   ansible.builtin.assert:
     that: results.changed
-
 
 - name: Update Express route
   azure_rm_expressroute:
@@ -67,7 +66,7 @@
     service_provider_properties:
       service_provider_name: Aryaka Networks
       peering_location: Seattle
-      bandwidth_in_mbps: '200'
+      bandwidth_in_mbps: "200"
     sku:
       tier: premium
       family: metereddata
@@ -78,7 +77,6 @@
     that:
       - results.changed
       - results.state.tags.test == 'modified'
-
 
 - name: Retrieve Express Route
   azure_rm_expressroute_info:
