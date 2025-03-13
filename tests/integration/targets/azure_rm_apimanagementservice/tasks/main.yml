@@ -1,6 +1,7 @@
+---
 - name: Fix resource prefix
   ansible.builtin.set_fact:
-    name_rpfx: "myPolicy{{ resource_group | hash('md5') | truncate(22, True, '') }}"
+    name_rpfx: myPolicy{{ resource_group | hash('md5') | truncate(22, True, '') }}
 
 - name: To create api management service
   azure_rm_apimanagementservice:
