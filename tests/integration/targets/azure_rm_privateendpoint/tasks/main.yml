@@ -1,6 +1,7 @@
+---
 - name: Set Private Endpoint Name
   ansible.builtin.set_fact:
-    rpfx: "private{{ resource_group | hash('md5') | truncate(18, True, '') }}"
+    rpfx: private{{ resource_group | hash('md5') | truncate(18, True, '') }}
 
 - name: Create virtual network
   azure_rm_virtualnetwork:
@@ -22,7 +23,7 @@
     name: subnet{{ rpfx }}
     virtual_network_name: vnet{{ rpfx }}
     resource_group: "{{ resource_group }}"
-    address_prefix_cidr: "10.1.0.0/16"
+    address_prefix_cidr: 10.1.0.0/16
     security_group: secgroup{{ rpfx }}
     private_endpoint_network_policies: Disabled
     private_link_service_network_policies: Disabled
