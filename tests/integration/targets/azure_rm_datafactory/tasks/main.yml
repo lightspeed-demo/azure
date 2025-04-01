@@ -1,6 +1,7 @@
+---
 - name: Create data factory name
   ansible.builtin.set_fact:
-    name_rpfx: "df{{ resource_group | hash('md5') | truncate(21, True, '') }}"
+    name_rpfx: df{{ resource_group | hash('md5') | truncate(21, True, '') }}
 
 - name: Create data factory (Checkmode)
   azure_rm_datafactory:
