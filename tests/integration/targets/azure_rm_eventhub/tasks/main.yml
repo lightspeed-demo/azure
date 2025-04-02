@@ -1,14 +1,15 @@
+---
 - name: Create random event hub and namespace
   ansible.builtin.set_fact:
-    namespace_name: "test{{ resource_group | hash('md5') | truncate(16, True, '') + (65535 | random | string) }}"
-    name_rpfx: "test{{ resource_group | hash('md5') | truncate(16, True, '') + (65535 | random | string) }}"
+    namespace_name: test{{ resource_group | hash('md5') | truncate(16, True, '') + (65535 | random | string) }}
+    name_rpfx: test{{ resource_group | hash('md5') | truncate(16, True, '') + (65535 | random | string) }}
 
 - name: Create Event Hub Namespace (check mode)
   azure_rm_eventhub:
     location: eastus2
     namespace_name: "{{ namespace_name }}"
     resource_group: "{{ resource_group }}"
-    sku: "Basic"
+    sku: Basic
   check_mode: true
   register: results
 
@@ -22,7 +23,7 @@
     namespace_name: "{{ namespace_name }}"
     name: "{{ name_rpfx }}"
     resource_group: "{{ resource_group }}"
-    sku: "Basic"
+    sku: Basic
   check_mode: true
   register: results
 
@@ -35,7 +36,7 @@
     location: eastus2
     namespace_name: "{{ namespace_name }}"
     resource_group: "{{ resource_group }}"
-    sku: "Basic"
+    sku: Basic
   register: results
 
 - name: Assert the event hub namespace created
@@ -59,7 +60,7 @@
     location: eastus2
     namespace_name: "{{ namespace_name }}"
     resource_group: "{{ resource_group }}"
-    sku: "Standard"
+    sku: Standard
     tags:
       test: modified
   register: results
@@ -98,7 +99,7 @@
     location: eastus2
     namespace_name: "{{ namespace_name }}"
     resource_group: "{{ resource_group }}"
-    sku: "Standard"
+    sku: Standard
     tags:
       test: modified
   register: results

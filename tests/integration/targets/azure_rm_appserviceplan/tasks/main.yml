@@ -1,3 +1,4 @@
+---
 - name: Prepare facts
   ansible.builtin.set_fact:
     resource_prefix: "{{ resource_group_secondary | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
