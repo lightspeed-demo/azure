@@ -1,9 +1,10 @@
+---
 - name: Fix resource prefix
   ansible.builtin.set_fact:
-    redis_name: "redis-{{ resource_group | hash('md5') | truncate(7, True, '') }}-{{ 1000 | random }}"
-    vnet_name: "vnet-{{ resource_group | hash('md5') | truncate(7, True, '') }}-{{ 1000 | random }}"
-    subnet_name: "subnet-{{ resource_group | hash('md5') | truncate(7, True, '') }}-{{ 1000 | random }}"
-    rule_name: "rule1"
+    redis_name: redis-{{ resource_group | hash('md5') | truncate(7, True, '') }}-{{ 1000 | random }}
+    vnet_name: vnet-{{ resource_group | hash('md5') | truncate(7, True, '') }}-{{ 1000 | random }}
+    subnet_name: subnet-{{ resource_group | hash('md5') | truncate(7, True, '') }}-{{ 1000 | random }}
+    rule_name: rule1
   run_once: true
 
 - name: Create a redis cache (Check Mode)
@@ -69,13 +70,12 @@
     that:
       - not output.changed
 
-
 - name: Long-running rediscache tests [run with `--tags long_run,untagged` to enable]
- # creating redis Cache costs about 20 mins async operation,
- # need to poll status from Creating to Running, then able to perform updating/deleting operation,
- # otherwise, will met error:
- # "The resource '<resource_id>' is busy processing a previous update request or is undergoing system maintenance.
- # As such, it is currently unable to accept the update request.  Please try again later."
+  # creating redis Cache costs about 20 mins async operation,
+  # need to poll status from Creating to Running, then able to perform updating/deleting operation,
+  # otherwise, will met error:
+  # "The resource '<resource_id>' is busy processing a previous update request or is undergoing system maintenance.
+  # As such, it is currently unable to accept the update request.  Please try again later."
   block:
     - name: Wait for Redis provisioning to complete
       azure_rm_rediscache_info:
@@ -187,7 +187,7 @@
       size: C1
     redis_version: "6"
     minimum_tls_version: "1.2"
-    public_network_access: "Disabled"
+    public_network_access: Disabled
     wait_for_provisioning: false
   register: output
 - name: Assert creating redis cache
@@ -213,13 +213,12 @@
       - facts.rediscaches[0].minimum_tls_version == '1.2'
       - facts.rediscaches[0].public_network_access == 'Disabled'
 
-
 - name: Long-running enhanced rediscache tests [run with `--tags long_run,untagged` to enable]
- # creating redis Cache costs about 20 mins async operation,
- # need to poll status from Creating to Running, then able to perform updating/deleting operation,
- # otherwise, will met error:
- # "The resource '<resource_id>' is busy processing a previous update request or is undergoing system maintenance.
- # As such, it is currently unable to accept the update request.  Please try again later."
+  # creating redis Cache costs about 20 mins async operation,
+  # need to poll status from Creating to Running, then able to perform updating/deleting operation,
+  # otherwise, will met error:
+  # "The resource '<resource_id>' is busy processing a previous update request or is undergoing system maintenance.
+  # As such, it is currently unable to accept the update request.  Please try again later."
   block:
     - name: Wait for Redis provisioning to complete
       azure_rm_rediscache_info:
@@ -239,7 +238,7 @@
           size: C1
         redis_version: "6"
         minimum_tls_version: "1.2"
-        public_network_access: "Disabled"
+        public_network_access: Disabled
         wait_for_provisioning: true
       register: output
     - name: Assert output not changed
@@ -256,7 +255,7 @@
           size: C1
         redis_version: "6"
         minimum_tls_version: "1.1"
-        public_network_access: "Disabled"
+        public_network_access: Disabled
         wait_for_provisioning: true
       register: output
     - name: Assert output changed
@@ -273,7 +272,7 @@
           size: C1
         redis_version: "6"
         minimum_tls_version: "1.1"
-        public_network_access: "Enabled"
+        public_network_access: Enabled
         wait_for_provisioning: true
       register: output
     - name: Assert output changed
@@ -301,10 +300,10 @@
           size: C1
         redis_version: "6"
         minimum_tls_version: "1.1"
-        public_network_access: "Enabled"
+        public_network_access: Enabled
         wait_for_provisioning: true
       register: output
-      failed_when: "output.changed or 'not supported' not in output.msg"
+      failed_when: output.changed or 'not supported' not in output.msg
 
     - name: Delete the redis cache
       azure_rm_rediscache:
@@ -323,13 +322,13 @@
   azure_rm_virtualnetwork:
     resource_group: "{{ resource_group }}"
     name: "{{ vnet_name }}"
-    address_prefixes: "10.10.0.0/16"
+    address_prefixes: 10.10.0.0/16
 
 - name: Add subnet
   azure_rm_subnet:
     resource_group: "{{ resource_group }}"
     name: "{{ subnet_name }}"
-    address_prefix: "10.10.0.0/24"
+    address_prefix: 10.10.0.0/24
     virtual_network: "{{ vnet_name }}"
 
 - name: Create redis with subnet
@@ -381,12 +380,12 @@
       - output.changed
 
 - name: Long-running key/firewallrule tests [run with `--tags long_run,untagged` to enable]
-# Creating firewall rule need Redis status is running, while creating redis Cache costs about 20 mins async operation,
-# need to poll status from Creating to Running, then able to perform firewall rule creating,
-# otherwise, will met error:
-# "Error creating/updating Firewall rule of Azure Cache for Redis: Azure Error: Conflict\nMessage: The resource
-# '/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myResourceGroup/providers/Microsoft.Cache/Redis/myRedis' is busy processing
-# a previous update request or is undergoing system maintenance.  As such, it is currently unable to accept the update request.  Please try again later."
+  # Creating firewall rule need Redis status is running, while creating redis Cache costs about 20 mins async operation,
+  # need to poll status from Creating to Running, then able to perform firewall rule creating,
+  # otherwise, will met error:
+  # "Error creating/updating Firewall rule of Azure Cache for Redis: Azure Error: Conflict\nMessage: The resource
+  # '/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myResourceGroup/providers/Microsoft.Cache/Redis/myRedis' is busy processing
+  # a previous update request or is undergoing system maintenance.  As such, it is currently unable to accept the update request.  Please try again later."
   block:
     - name: Wait for Redis provisioning to complete
       azure_rm_rediscache_info:
@@ -451,7 +450,7 @@
         resource_group: "{{ resource_group }}"
         name: "{{ redis_name }}2"
         regenerate_key:
-          key_type: "primary"
+          key_type: primary
       register: output
 
     - name: Assert output
