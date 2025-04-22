@@ -1,3 +1,4 @@
+---
 - name: Fix resource prefix
   ansible.builtin.set_fact:
     virtual_network_name: myVirtualNetwork
@@ -24,7 +25,7 @@
     name: "{{ subnet_name }}"
     virtual_network_name: "{{ virtual_network_name }}"
     resource_group: "{{ resource_group }}"
-    address_prefix_cidr: "10.1.0.0/24"
+    address_prefix_cidr: 10.1.0.0/24
 
 - name: Create public IP address
   azure_rm_publicipaddress:
@@ -40,8 +41,8 @@
 
 - name: Create Azure Firewall
   azure_rm_azurefirewall:
-    resource_group: '{{ resource_group }}'
-    name: '{{ azure_firewall_name }}'
+    resource_group: "{{ resource_group }}"
+    name: "{{ azure_firewall_name }}"
     # tags:
     #   key1: value1
     application_rule_collections:
@@ -55,7 +56,7 @@
               - 10.0.0.0/25
             protocols:
               - type: https
-                port: '443'
+                port: "443"
             target_fqdns:
               - www.test.com
         name: apprulecoll
@@ -66,15 +67,15 @@
           - name: DNAT-HTTPS-traffic
             description: D-NAT all outbound web traffic for inspection
             source_addresses:
-              - '*'
+              - "*"
             destination_addresses:
               - "{{ pip_output.state.ip_address }}"
             destination_ports:
-              - '443'
+              - "443"
             protocols:
               - tcp
             translated_address: 1.2.3.5
-            translated_port: '8443'
+            translated_port: "8443"
         name: natrulecoll
     network_rule_collections:
       - priority: 112
@@ -88,10 +89,10 @@
               - 192.168.1.1-192.168.1.12
               - 10.1.4.12-10.1.4.255
             destination_addresses:
-              - '*'
+              - "*"
             destination_ports:
               - 443-444
-              - '8443'
+              - "8443"
         name: netrulecoll
     ip_configurations:
       - subnet:
@@ -113,8 +114,8 @@
 
 - name: Create Azure Firewall -- idempotent
   azure_rm_azurefirewall:
-    resource_group: '{{ resource_group }}'
-    name: '{{ azure_firewall_name }}'
+    resource_group: "{{ resource_group }}"
+    name: "{{ azure_firewall_name }}"
     application_rule_collections:
       - priority: 110
         action: deny
@@ -126,7 +127,7 @@
               - 10.0.0.0/25
             protocols:
               - type: https
-                port: '443'
+                port: "443"
             target_fqdns:
               - www.test.com
         name: apprulecoll
@@ -137,15 +138,15 @@
           - name: DNAT-HTTPS-traffic
             description: D-NAT all outbound web traffic for inspection
             source_addresses:
-              - '*'
+              - "*"
             destination_addresses:
               - "{{ pip_output.state.ip_address }}"
             destination_ports:
-              - '443'
+              - "443"
             protocols:
               - tcp
             translated_address: 1.2.3.5
-            translated_port: '8443'
+            translated_port: "8443"
         name: natrulecoll
     network_rule_collections:
       - priority: 112
@@ -159,10 +160,10 @@
               - 192.168.1.1-192.168.1.12
               - 10.1.4.12-10.1.4.255
             destination_addresses:
-              - '*'
+              - "*"
             destination_ports:
               - 443-444
-              - '8443'
+              - "8443"
         name: netrulecoll
     ip_configurations:
       - subnet:
@@ -184,8 +185,8 @@
 
 - name: Create Azure Firewall -- change something
   azure_rm_azurefirewall:
-    resource_group: '{{ resource_group }}'
-    name: '{{ azure_firewall_name }}'
+    resource_group: "{{ resource_group }}"
+    name: "{{ azure_firewall_name }}"
     application_rule_collections:
       - priority: 110
         action: deny
@@ -197,7 +198,7 @@
               - 10.0.0.0/25
             protocols:
               - type: https
-                port: '443'
+                port: "443"
             target_fqdns:
               - www.test.com
         name: apprulecoll
@@ -208,15 +209,15 @@
           - name: DNAT-HTTPS-traffic
             description: D-NAT all outbound web traffic for inspection
             source_addresses:
-              - '*'
+              - "*"
             destination_addresses:
               - "{{ pip_output.state.ip_address }}"
             destination_ports:
-              - '443'
+              - "443"
             protocols:
               - tcp
             translated_address: 1.2.3.6
-            translated_port: '8443'
+            translated_port: "8443"
         name: natrulecoll
     network_rule_collections:
       - priority: 112
@@ -230,10 +231,10 @@
               - 192.168.1.1-192.168.1.12
               - 10.1.4.12-10.1.4.255
             destination_addresses:
-              - '*'
+              - "*"
             destination_ports:
               - 443-445
-              - '8443'
+              - "8443"
         name: netrulecoll
     ip_configurations:
       - subnet:
@@ -252,8 +253,8 @@
 
 - name: Get info of the Azure Firewall
   azure_rm_azurefirewall_info:
-    resource_group: '{{ resource_group }}'
-    name: '{{ azure_firewall_name }}'
+    resource_group: "{{ resource_group }}"
+    name: "{{ azure_firewall_name }}"
   register: output
 
 - name: Assert the azure firewall facts
@@ -271,8 +272,8 @@
 
 - name: Delete Azure Firewall
   azure_rm_azurefirewall:
-    resource_group: '{{ resource_group }}'
-    name: '{{ azure_firewall_name }}'
+    resource_group: "{{ resource_group }}"
+    name: "{{ azure_firewall_name }}"
     state: absent
   register: output
 
