@@ -1,3 +1,4 @@
+---
 - name: Set varialbles
   ansible.builtin.set_fact:
     name_rpfx: "{{ resource_group | hash('md5') | truncate(22, True, '') }}"
@@ -49,7 +50,7 @@
 - name: Create a VirtualWan
   azure_rm_virtualwan:
     resource_group: "{{ resource_group }}"
-    name: "wan-{{ name_rpfx }}"
+    name: wan-{{ name_rpfx }}
     disable_vpn_encryption: true
     allow_branch_to_branch_traffic: true
     allow_vnet_to_vnet_traffic: true
