@@ -1,3 +1,4 @@
+---
 - name: Set varialbles
   ansible.builtin.set_fact:
     rpfx: "{{ resource_group | hash('md5') | truncate(8, True, '') }}"
@@ -13,29 +14,31 @@
 
 - name: Create an AKS instance (check mode)
   azure_rm_aks:
-    name: "aks{{ rpfx }}"
+    name: aks{{ rpfx }}
     resource_group: "{{ resource_group }}"
     location: eastus
-    dns_prefix: "aks{{ rpfx }}"
+    dns_prefix: aks{{ rpfx }}
     kubernetes_version: "{{ versions.azure_aks_versions[0] }}"
     service_principal:
       client_id: "{{ azure_client_id }}"
       client_secret: "{{ azure_secret }}"
     linux_profile:
       admin_username: azureuser
-      ssh_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDSPmiqkvDH1/+MDAVDZT8381aYqp73Odz8cnD5hegNhqtXajqtiH0umVg7HybX3wt1HjcrwKJovZURcIbbcDvzdH2bnYbF93T4OLXA0bIfuIp6M86x1iutFtXdpN3TTicINrmSXEE2Ydm51iMu77B08ZERjVaToya2F7vC+egfoPvibf7OLxE336a5tPCywavvNihQjL8sjgpDT5AAScjb3YqK/6VLeQ18Ggt8/ufINsYkb+9/Ji/3OcGFeflnDXq80vPUyF3u4iIylob6RSZenC38cXmQB05tRNxS1B6BXCjMRdy0v4pa7oKM2GA4ADKpNrr0RI9ed+peRFwmsclH test@ansible
+      ssh_key: ssh-rsa 
+        AAAAB3NzaC1yc2EAAAADAQABAAABAQDSPmiqkvDH1/+MDAVDZT8381aYqp73Odz8cnD5hegNhqtXajqtiH0umVg7HybX3wt1HjcrwKJovZURcIbbcDvzdH2bnYbF93T4OLXA0bIfuIp6M86x1iutFtXdpN3TTicINrmSXEE2Ydm51iMu77B08ZERjVaToya2F7vC+egfoPvibf7OLxE336a5tPCywavvNihQjL8sjgpDT5AAScjb3YqK/6VLeQ18Ggt8/ufINsYkb+9/Ji/3OcGFeflnDXq80vPUyF3u4iIylob6RSZenC38cXmQB05tRNxS1B6BXCjMRdy0v4pa7oKM2GA4ADKpNrr0RI9ed+peRFwmsclH
+        test@ansible
     agent_pool_profiles:
       - name: default
         count: 1
         vm_size: Standard_B2s
         type: VirtualMachineScaleSets
         mode: System
-        node_labels: {"release":"stable"}
+        node_labels: { release: stable }
         max_pods: 42
         availability_zones:
           - 1
           - 2
-    node_resource_group: "node{{ noderpfx }}"
+    node_resource_group: node{{ noderpfx }}
     enable_rbac: true
     network_profile:
       load_balancer_sku: standard
@@ -43,40 +46,42 @@
 
 - name: Check there is no AKS created
   azure_rm_aks_info:
-    name: "aks{{ rpfx }}"
+    name: aks{{ rpfx }}
     resource_group: "{{ resource_group }}"
   register: fact
 
 - name: Check there is no AKS created
   ansible.builtin.assert:
     that:
-      - "fact.aks | length == 0"
+      - fact.aks | length == 0
 
 - name: Create an AKS instance
   azure_rm_aks:
-    name: "aks{{ rpfx }}"
+    name: aks{{ rpfx }}
     resource_group: "{{ resource_group }}"
     location: eastus
-    dns_prefix: "aks{{ rpfx }}"
+    dns_prefix: aks{{ rpfx }}
     kubernetes_version: "{{ versions.azure_aks_versions[0] }}"
     service_principal:
       client_id: "{{ azure_client_id }}"
       client_secret: "{{ azure_secret }}"
     linux_profile:
       admin_username: azureuser
-      ssh_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDSPmiqkvDH1/+MDAVDZT8381aYqp73Odz8cnD5hegNhqtXajqtiH0umVg7HybX3wt1HjcrwKJovZURcIbbcDvzdH2bnYbF93T4OLXA0bIfuIp6M86x1iutFtXdpN3TTicINrmSXEE2Ydm51iMu77B08ZERjVaToya2F7vC+egfoPvibf7OLxE336a5tPCywavvNihQjL8sjgpDT5AAScjb3YqK/6VLeQ18Ggt8/ufINsYkb+9/Ji/3OcGFeflnDXq80vPUyF3u4iIylob6RSZenC38cXmQB05tRNxS1B6BXCjMRdy0v4pa7oKM2GA4ADKpNrr0RI9ed+peRFwmsclH test@ansible
+      ssh_key: ssh-rsa 
+        AAAAB3NzaC1yc2EAAAADAQABAAABAQDSPmiqkvDH1/+MDAVDZT8381aYqp73Odz8cnD5hegNhqtXajqtiH0umVg7HybX3wt1HjcrwKJovZURcIbbcDvzdH2bnYbF93T4OLXA0bIfuIp6M86x1iutFtXdpN3TTicINrmSXEE2Ydm51iMu77B08ZERjVaToya2F7vC+egfoPvibf7OLxE336a5tPCywavvNihQjL8sjgpDT5AAScjb3YqK/6VLeQ18Ggt8/ufINsYkb+9/Ji/3OcGFeflnDXq80vPUyF3u4iIylob6RSZenC38cXmQB05tRNxS1B6BXCjMRdy0v4pa7oKM2GA4ADKpNrr0RI9ed+peRFwmsclH
+        test@ansible
     agent_pool_profiles:
       - name: default
         count: 1
         vm_size: Standard_B2s
         type: VirtualMachineScaleSets
         mode: System
-        node_labels: {"release":"stable"}
+        node_labels: { release: stable }
         max_pods: 42
         availability_zones:
           - 1
           - 2
-    node_resource_group: "node{{ noderpfx }}"
+    node_resource_group: node{{ noderpfx }}
     enable_rbac: true
     network_profile:
       load_balancer_sku: standard
@@ -90,14 +95,14 @@
 
 - name: Get AKS fact
   azure_rm_aks_info:
-    name: "aks{{ rpfx }}"
+    name: aks{{ rpfx }}
     resource_group: "{{ resource_group }}"
   register: fact
 
 - name: Assert fact returns the created one
   ansible.builtin.assert:
     that:
-      - "fact.aks | length == 1"
+      - fact.aks | length == 1
       - fact.aks[0].id == output.id
       - fact.aks[0].agent_pool_profiles[0].availability_zones == ["1", "2"]
       - fact.aks[0].agent_pool_profiles[0].mode == "System"
@@ -105,29 +110,31 @@
 
 - name: Update an AKS instance node_labels
   azure_rm_aks:
-    name: "aks{{ rpfx }}"
+    name: aks{{ rpfx }}
     resource_group: "{{ resource_group }}"
     location: eastus
-    dns_prefix: "aks{{ rpfx }}"
+    dns_prefix: aks{{ rpfx }}
     kubernetes_version: "{{ versions.azure_aks_versions[0] }}"
     service_principal:
       client_id: "{{ azure_client_id }}"
       client_secret: "{{ azure_secret }}"
     linux_profile:
       admin_username: azureuser
-      ssh_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDSPmiqkvDH1/+MDAVDZT8381aYqp73Odz8cnD5hegNhqtXajqtiH0umVg7HybX3wt1HjcrwKJovZURcIbbcDvzdH2bnYbF93T4OLXA0bIfuIp6M86x1iutFtXdpN3TTicINrmSXEE2Ydm51iMu77B08ZERjVaToya2F7vC+egfoPvibf7OLxE336a5tPCywavvNihQjL8sjgpDT5AAScjb3YqK/6VLeQ18Ggt8/ufINsYkb+9/Ji/3OcGFeflnDXq80vPUyF3u4iIylob6RSZenC38cXmQB05tRNxS1B6BXCjMRdy0v4pa7oKM2GA4ADKpNrr0RI9ed+peRFwmsclH test@ansible
+      ssh_key: ssh-rsa 
+        AAAAB3NzaC1yc2EAAAADAQABAAABAQDSPmiqkvDH1/+MDAVDZT8381aYqp73Odz8cnD5hegNhqtXajqtiH0umVg7HybX3wt1HjcrwKJovZURcIbbcDvzdH2bnYbF93T4OLXA0bIfuIp6M86x1iutFtXdpN3TTicINrmSXEE2Ydm51iMu77B08ZERjVaToya2F7vC+egfoPvibf7OLxE336a5tPCywavvNihQjL8sjgpDT5AAScjb3YqK/6VLeQ18Ggt8/ufINsYkb+9/Ji/3OcGFeflnDXq80vPUyF3u4iIylob6RSZenC38cXmQB05tRNxS1B6BXCjMRdy0v4pa7oKM2GA4ADKpNrr0RI9ed+peRFwmsclH
+        test@ansible
     agent_pool_profiles:
       - name: default
         count: 1
         vm_size: Standard_B2s
         type: VirtualMachineScaleSets
         mode: System
-        node_labels: {"release":"stable", "environment":"dev"}
+        node_labels: { release: stable, environment: dev }
         max_pods: 42
         availability_zones:
           - 1
           - 2
-    node_resource_group: "node{{ noderpfx }}"
+    node_resource_group: node{{ noderpfx }}
     enable_rbac: true
     network_profile:
       load_balancer_sku: standard
@@ -140,41 +147,43 @@
 
 - name: Get AKS fact
   azure_rm_aks_info:
-    name: "aks{{ rpfx }}"
+    name: aks{{ rpfx }}
     resource_group: "{{ resource_group }}"
   register: fact
 
 - name: Assert fact returns the created one
   ansible.builtin.assert:
     that:
-      - "fact.aks | length == 1"
+      - fact.aks | length == 1
       - fact.aks[0].id == output.id
       - fact.aks[0].agent_pool_profiles[0].node_labels | length == 2
 
 - name: Get AKS upgrade versions
   azure_rm_aksupgrade_info:
-    name: "aks{{ rpfx }}"
+    name: aks{{ rpfx }}
     resource_group: "{{ resource_group }}"
   register: upgrades
 
 - name: Assert available control-plane versions for upgrade
   ansible.builtin.assert:
     that:
-      - "upgrades.azure_aks_upgrades.control_plane_profile.kubernetes_version == versions.azure_aks_versions[0]"
-      - "upgrades.azure_aks_upgrades.control_plane_profile.upgrades | length > 0"
+      - upgrades.azure_aks_upgrades.control_plane_profile.kubernetes_version == versions.azure_aks_versions[0]
+      - upgrades.azure_aks_upgrades.control_plane_profile.upgrades | length > 0
 
 - name: Create an AKS instance (idempotent)
   azure_rm_aks:
-    name: "aks{{ rpfx }}"
+    name: aks{{ rpfx }}
     resource_group: "{{ resource_group }}"
     location: eastus
-    dns_prefix: "aks{{ rpfx }}"
+    dns_prefix: aks{{ rpfx }}
     kubernetes_version: "{{ versions.azure_aks_versions[0] }}"
     service_principal:
       client_id: "{{ azure_client_id }}"
     linux_profile:
       admin_username: azureuser
-      ssh_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDSPmiqkvDH1/+MDAVDZT8381aYqp73Odz8cnD5hegNhqtXajqtiH0umVg7HybX3wt1HjcrwKJovZURcIbbcDvzdH2bnYbF93T4OLXA0bIfuIp6M86x1iutFtXdpN3TTicINrmSXEE2Ydm51iMu77B08ZERjVaToya2F7vC+egfoPvibf7OLxE336a5tPCywavvNihQjL8sjgpDT5AAScjb3YqK/6VLeQ18Ggt8/ufINsYkb+9/Ji/3OcGFeflnDXq80vPUyF3u4iIylob6RSZenC38cXmQB05tRNxS1B6BXCjMRdy0v4pa7oKM2GA4ADKpNrr0RI9ed+peRFwmsclH test@ansible
+      ssh_key: ssh-rsa 
+        AAAAB3NzaC1yc2EAAAADAQABAAABAQDSPmiqkvDH1/+MDAVDZT8381aYqp73Odz8cnD5hegNhqtXajqtiH0umVg7HybX3wt1HjcrwKJovZURcIbbcDvzdH2bnYbF93T4OLXA0bIfuIp6M86x1iutFtXdpN3TTicINrmSXEE2Ydm51iMu77B08ZERjVaToya2F7vC+egfoPvibf7OLxE336a5tPCywavvNihQjL8sjgpDT5AAScjb3YqK/6VLeQ18Ggt8/ufINsYkb+9/Ji/3OcGFeflnDXq80vPUyF3u4iIylob6RSZenC38cXmQB05tRNxS1B6BXCjMRdy0v4pa7oKM2GA4ADKpNrr0RI9ed+peRFwmsclH
+        test@ansible
     agent_pool_profiles:
       - name: default
         count: 1
@@ -185,7 +194,7 @@
         availability_zones:
           - 1
           - 2
-    node_resource_group: "node{{ noderpfx }}"
+    node_resource_group: node{{ noderpfx }}
     enable_rbac: true
     network_profile:
       load_balancer_sku: standard
@@ -204,16 +213,18 @@
 
 - name: Upgrade the AKS instance with addon
   azure_rm_aks:
-    name: "aks{{ rpfx }}"
+    name: aks{{ rpfx }}
     resource_group: "{{ resource_group }}"
     location: eastus
-    dns_prefix: "aks{{ rpfx }}"
+    dns_prefix: aks{{ rpfx }}
     kubernetes_version: "{{ version1.azure_aks_versions[0] }}"
     service_principal:
       client_id: "{{ azure_client_id }}"
     linux_profile:
       admin_username: azureuser
-      ssh_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDSPmiqkvDH1/+MDAVDZT8381aYqp73Odz8cnD5hegNhqtXajqtiH0umVg7HybX3wt1HjcrwKJovZURcIbbcDvzdH2bnYbF93T4OLXA0bIfuIp6M86x1iutFtXdpN3TTicINrmSXEE2Ydm51iMu77B08ZERjVaToya2F7vC+egfoPvibf7OLxE336a5tPCywavvNihQjL8sjgpDT5AAScjb3YqK/6VLeQ18Ggt8/ufINsYkb+9/Ji/3OcGFeflnDXq80vPUyF3u4iIylob6RSZenC38cXmQB05tRNxS1B6BXCjMRdy0v4pa7oKM2GA4ADKpNrr0RI9ed+peRFwmsclH test@ansible
+      ssh_key: ssh-rsa 
+        AAAAB3NzaC1yc2EAAAADAQABAAABAQDSPmiqkvDH1/+MDAVDZT8381aYqp73Odz8cnD5hegNhqtXajqtiH0umVg7HybX3wt1HjcrwKJovZURcIbbcDvzdH2bnYbF93T4OLXA0bIfuIp6M86x1iutFtXdpN3TTicINrmSXEE2Ydm51iMu77B08ZERjVaToya2F7vC+egfoPvibf7OLxE336a5tPCywavvNihQjL8sjgpDT5AAScjb3YqK/6VLeQ18Ggt8/ufINsYkb+9/Ji/3OcGFeflnDXq80vPUyF3u4iIylob6RSZenC38cXmQB05tRNxS1B6BXCjMRdy0v4pa7oKM2GA4ADKpNrr0RI9ed+peRFwmsclH
+        test@ansible
     agent_pool_profiles:
       - name: default
         count: 1
@@ -224,7 +235,7 @@
         availability_zones:
           - 1
           - 2
-    node_resource_group: "node{{ noderpfx }}"
+    node_resource_group: node{{ noderpfx }}
     addon:
       http_application_routing: {}
     network_profile:
@@ -244,16 +255,18 @@
 
 - name: Upgrade the AKS instance with addon (idempontent)
   azure_rm_aks:
-    name: "aks{{ rpfx }}"
+    name: aks{{ rpfx }}
     resource_group: "{{ resource_group }}"
     location: eastus
-    dns_prefix: "aks{{ rpfx }}"
+    dns_prefix: aks{{ rpfx }}
     kubernetes_version: "{{ version1.azure_aks_versions[0] }}"
     service_principal:
       client_id: "{{ azure_client_id }}"
     linux_profile:
       admin_username: azureuser
-      ssh_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDSPmiqkvDH1/+MDAVDZT8381aYqp73Odz8cnD5hegNhqtXajqtiH0umVg7HybX3wt1HjcrwKJovZURcIbbcDvzdH2bnYbF93T4OLXA0bIfuIp6M86x1iutFtXdpN3TTicINrmSXEE2Ydm51iMu77B08ZERjVaToya2F7vC+egfoPvibf7OLxE336a5tPCywavvNihQjL8sjgpDT5AAScjb3YqK/6VLeQ18Ggt8/ufINsYkb+9/Ji/3OcGFeflnDXq80vPUyF3u4iIylob6RSZenC38cXmQB05tRNxS1B6BXCjMRdy0v4pa7oKM2GA4ADKpNrr0RI9ed+peRFwmsclH test@ansible
+      ssh_key: ssh-rsa 
+        AAAAB3NzaC1yc2EAAAADAQABAAABAQDSPmiqkvDH1/+MDAVDZT8381aYqp73Odz8cnD5hegNhqtXajqtiH0umVg7HybX3wt1HjcrwKJovZURcIbbcDvzdH2bnYbF93T4OLXA0bIfuIp6M86x1iutFtXdpN3TTicINrmSXEE2Ydm51iMu77B08ZERjVaToya2F7vC+egfoPvibf7OLxE336a5tPCywavvNihQjL8sjgpDT5AAScjb3YqK/6VLeQ18Ggt8/ufINsYkb+9/Ji/3OcGFeflnDXq80vPUyF3u4iIylob6RSZenC38cXmQB05tRNxS1B6BXCjMRdy0v4pa7oKM2GA4ADKpNrr0RI9ed+peRFwmsclH
+        test@ansible
     agent_pool_profiles:
       - name: default
         count: 1
@@ -264,7 +277,7 @@
         availability_zones:
           - 1
           - 2
-    node_resource_group: "node{{ noderpfx }}"
+    node_resource_group: node{{ noderpfx }}
     addon:
       http_application_routing: {}
     network_profile:
@@ -280,17 +293,19 @@
 
 - name: Upgrade the AKS instance with agent pool profiles
   azure_rm_aks:
-    name: "aks{{ rpfx }}"
+    name: aks{{ rpfx }}
     resource_group: "{{ resource_group }}"
     location: eastus
-    dns_prefix: "aks{{ rpfx }}"
+    dns_prefix: aks{{ rpfx }}
     kubernetes_version: "{{ version1.azure_aks_versions[0] }}"
     service_principal:
       client_id: "{{ azure_client_id }}"
       client_secret: "{{ azure_secret }}"
     linux_profile:
       admin_username: azureuser
-      ssh_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDSPmiqkvDH1/+MDAVDZT8381aYqp73Odz8cnD5hegNhqtXajqtiH0umVg7HybX3wt1HjcrwKJovZURcIbbcDvzdH2bnYbF93T4OLXA0bIfuIp6M86x1iutFtXdpN3TTicINrmSXEE2Ydm51iMu77B08ZERjVaToya2F7vC+egfoPvibf7OLxE336a5tPCywavvNihQjL8sjgpDT5AAScjb3YqK/6VLeQ18Ggt8/ufINsYkb+9/Ji/3OcGFeflnDXq80vPUyF3u4iIylob6RSZenC38cXmQB05tRNxS1B6BXCjMRdy0v4pa7oKM2GA4ADKpNrr0RI9ed+peRFwmsclH test@ansible
+      ssh_key: ssh-rsa 
+        AAAAB3NzaC1yc2EAAAADAQABAAABAQDSPmiqkvDH1/+MDAVDZT8381aYqp73Odz8cnD5hegNhqtXajqtiH0umVg7HybX3wt1HjcrwKJovZURcIbbcDvzdH2bnYbF93T4OLXA0bIfuIp6M86x1iutFtXdpN3TTicINrmSXEE2Ydm51iMu77B08ZERjVaToya2F7vC+egfoPvibf7OLxE336a5tPCywavvNihQjL8sjgpDT5AAScjb3YqK/6VLeQ18Ggt8/ufINsYkb+9/Ji/3OcGFeflnDXq80vPUyF3u4iIylob6RSZenC38cXmQB05tRNxS1B6BXCjMRdy0v4pa7oKM2GA4ADKpNrr0RI9ed+peRFwmsclH
+        test@ansible
     agent_pool_profiles:
       - name: default
         count: 1
@@ -304,7 +319,7 @@
         availability_zones:
           - 1
           - 2
-    node_resource_group: "node{{ noderpfx }}"
+    node_resource_group: node{{ noderpfx }}
     enable_rbac: true
     network_profile:
       load_balancer_sku: standard
@@ -321,17 +336,19 @@
 
 - name: Upgrade the AKS instance with agent pool profiles (idempontent)
   azure_rm_aks:
-    name: "aks{{ rpfx }}"
+    name: aks{{ rpfx }}
     resource_group: "{{ resource_group }}"
     location: eastus
-    dns_prefix: "aks{{ rpfx }}"
+    dns_prefix: aks{{ rpfx }}
     kubernetes_version: "{{ version1.azure_aks_versions[0] }}"
     service_principal:
       client_id: "{{ azure_client_id }}"
       client_secret: "{{ azure_secret }}"
     linux_profile:
       admin_username: azureuser
-      ssh_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDSPmiqkvDH1/+MDAVDZT8381aYqp73Odz8cnD5hegNhqtXajqtiH0umVg7HybX3wt1HjcrwKJovZURcIbbcDvzdH2bnYbF93T4OLXA0bIfuIp6M86x1iutFtXdpN3TTicINrmSXEE2Ydm51iMu77B08ZERjVaToya2F7vC+egfoPvibf7OLxE336a5tPCywavvNihQjL8sjgpDT5AAScjb3YqK/6VLeQ18Ggt8/ufINsYkb+9/Ji/3OcGFeflnDXq80vPUyF3u4iIylob6RSZenC38cXmQB05tRNxS1B6BXCjMRdy0v4pa7oKM2GA4ADKpNrr0RI9ed+peRFwmsclH test@ansible
+      ssh_key: ssh-rsa 
+        AAAAB3NzaC1yc2EAAAADAQABAAABAQDSPmiqkvDH1/+MDAVDZT8381aYqp73Odz8cnD5hegNhqtXajqtiH0umVg7HybX3wt1HjcrwKJovZURcIbbcDvzdH2bnYbF93T4OLXA0bIfuIp6M86x1iutFtXdpN3TTicINrmSXEE2Ydm51iMu77B08ZERjVaToya2F7vC+egfoPvibf7OLxE336a5tPCywavvNihQjL8sjgpDT5AAScjb3YqK/6VLeQ18Ggt8/ufINsYkb+9/Ji/3OcGFeflnDXq80vPUyF3u4iIylob6RSZenC38cXmQB05tRNxS1B6BXCjMRdy0v4pa7oKM2GA4ADKpNrr0RI9ed+peRFwmsclH
+        test@ansible
     agent_pool_profiles:
       - name: default
         count: 1
@@ -345,7 +362,7 @@
         availability_zones:
           - 1
           - 2
-    node_resource_group: "node{{ noderpfx }}"
+    node_resource_group: node{{ noderpfx }}
     enable_rbac: true
     network_profile:
       load_balancer_sku: standard
@@ -358,17 +375,19 @@
 
 - name: Upgrade the AKS instance with multiple agent pool profiles
   azure_rm_aks:
-    name: "aks{{ rpfx }}"
+    name: aks{{ rpfx }}
     resource_group: "{{ resource_group }}"
     location: eastus
-    dns_prefix: "aks{{ rpfx }}"
+    dns_prefix: aks{{ rpfx }}
     kubernetes_version: "{{ version1.azure_aks_versions[0] }}"
     service_principal:
       client_id: "{{ azure_client_id }}"
       client_secret: "{{ azure_secret }}"
     linux_profile:
       admin_username: azureuser
-      ssh_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDSPmiqkvDH1/+MDAVDZT8381aYqp73Odz8cnD5hegNhqtXajqtiH0umVg7HybX3wt1HjcrwKJovZURcIbbcDvzdH2bnYbF93T4OLXA0bIfuIp6M86x1iutFtXdpN3TTicINrmSXEE2Ydm51iMu77B08ZERjVaToya2F7vC+egfoPvibf7OLxE336a5tPCywavvNihQjL8sjgpDT5AAScjb3YqK/6VLeQ18Ggt8/ufINsYkb+9/Ji/3OcGFeflnDXq80vPUyF3u4iIylob6RSZenC38cXmQB05tRNxS1B6BXCjMRdy0v4pa7oKM2GA4ADKpNrr0RI9ed+peRFwmsclH test@ansible
+      ssh_key: ssh-rsa 
+        AAAAB3NzaC1yc2EAAAADAQABAAABAQDSPmiqkvDH1/+MDAVDZT8381aYqp73Odz8cnD5hegNhqtXajqtiH0umVg7HybX3wt1HjcrwKJovZURcIbbcDvzdH2bnYbF93T4OLXA0bIfuIp6M86x1iutFtXdpN3TTicINrmSXEE2Ydm51iMu77B08ZERjVaToya2F7vC+egfoPvibf7OLxE336a5tPCywavvNihQjL8sjgpDT5AAScjb3YqK/6VLeQ18Ggt8/ufINsYkb+9/Ji/3OcGFeflnDXq80vPUyF3u4iIylob6RSZenC38cXmQB05tRNxS1B6BXCjMRdy0v4pa7oKM2GA4ADKpNrr0RI9ed+peRFwmsclH
+        test@ansible
     agent_pool_profiles:
       - name: default
         count: 1
@@ -387,7 +406,7 @@
         vm_size: Standard_B2s
         type: VirtualMachineScaleSets
         mode: User
-    node_resource_group: "node{{ noderpfx }}"
+    node_resource_group: node{{ noderpfx }}
     enable_rbac: true
     network_profile:
       load_balancer_sku: standard
@@ -398,7 +417,7 @@
   ansible.builtin.assert:
     that:
       - output.changed
-      - "output.agent_pool_profiles | length == 2"
+      - output.agent_pool_profiles | length == 2
       - output.provisioning_state == 'Succeeded'
       - output.agent_pool_profiles[1].mode == 'User'
   ignore_errors: true
@@ -406,17 +425,19 @@
 
 - name: Upgrade the AKS instance with multiple agent pool profiles (idempontent)
   azure_rm_aks:
-    name: "aks{{ rpfx }}"
+    name: aks{{ rpfx }}
     resource_group: "{{ resource_group }}"
     location: eastus
-    dns_prefix: "aks{{ rpfx }}"
+    dns_prefix: aks{{ rpfx }}
     kubernetes_version: "{{ version1.azure_aks_versions[0] }}"
     service_principal:
       client_id: "{{ azure_client_id }}"
       client_secret: "{{ azure_secret }}"
     linux_profile:
       admin_username: azureuser
-      ssh_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDSPmiqkvDH1/+MDAVDZT8381aYqp73Odz8cnD5hegNhqtXajqtiH0umVg7HybX3wt1HjcrwKJovZURcIbbcDvzdH2bnYbF93T4OLXA0bIfuIp6M86x1iutFtXdpN3TTicINrmSXEE2Ydm51iMu77B08ZERjVaToya2F7vC+egfoPvibf7OLxE336a5tPCywavvNihQjL8sjgpDT5AAScjb3YqK/6VLeQ18Ggt8/ufINsYkb+9/Ji/3OcGFeflnDXq80vPUyF3u4iIylob6RSZenC38cXmQB05tRNxS1B6BXCjMRdy0v4pa7oKM2GA4ADKpNrr0RI9ed+peRFwmsclH test@ansible
+      ssh_key: ssh-rsa 
+        AAAAB3NzaC1yc2EAAAADAQABAAABAQDSPmiqkvDH1/+MDAVDZT8381aYqp73Odz8cnD5hegNhqtXajqtiH0umVg7HybX3wt1HjcrwKJovZURcIbbcDvzdH2bnYbF93T4OLXA0bIfuIp6M86x1iutFtXdpN3TTicINrmSXEE2Ydm51iMu77B08ZERjVaToya2F7vC+egfoPvibf7OLxE336a5tPCywavvNihQjL8sjgpDT5AAScjb3YqK/6VLeQ18Ggt8/ufINsYkb+9/Ji/3OcGFeflnDXq80vPUyF3u4iIylob6RSZenC38cXmQB05tRNxS1B6BXCjMRdy0v4pa7oKM2GA4ADKpNrr0RI9ed+peRFwmsclH
+        test@ansible
     agent_pool_profiles:
       - name: default
         count: 1
@@ -434,7 +455,7 @@
         vm_size: Standard_B2s
         type: VirtualMachineScaleSets
         mode: User
-    node_resource_group: "node{{ noderpfx }}"
+    node_resource_group: node{{ noderpfx }}
     enable_rbac: true
     network_profile:
       load_balancer_sku: standard
@@ -447,17 +468,19 @@
 
 - name: Update the default2 agent_pool mode from User to System
   azure_rm_aks:
-    name: "aks{{ rpfx }}"
+    name: aks{{ rpfx }}
     resource_group: "{{ resource_group }}"
     location: eastus
-    dns_prefix: "aks{{ rpfx }}"
+    dns_prefix: aks{{ rpfx }}
     kubernetes_version: "{{ version1.azure_aks_versions[0] }}"
     service_principal:
       client_id: "{{ azure_client_id }}"
       client_secret: "{{ azure_secret }}"
     linux_profile:
       admin_username: azureuser
-      ssh_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDSPmiqkvDH1/+MDAVDZT8381aYqp73Odz8cnD5hegNhqtXajqtiH0umVg7HybX3wt1HjcrwKJovZURcIbbcDvzdH2bnYbF93T4OLXA0bIfuIp6M86x1iutFtXdpN3TTicINrmSXEE2Ydm51iMu77B08ZERjVaToya2F7vC+egfoPvibf7OLxE336a5tPCywavvNihQjL8sjgpDT5AAScjb3YqK/6VLeQ18Ggt8/ufINsYkb+9/Ji/3OcGFeflnDXq80vPUyF3u4iIylob6RSZenC38cXmQB05tRNxS1B6BXCjMRdy0v4pa7oKM2GA4ADKpNrr0RI9ed+peRFwmsclH test@ansible
+      ssh_key: ssh-rsa 
+        AAAAB3NzaC1yc2EAAAADAQABAAABAQDSPmiqkvDH1/+MDAVDZT8381aYqp73Odz8cnD5hegNhqtXajqtiH0umVg7HybX3wt1HjcrwKJovZURcIbbcDvzdH2bnYbF93T4OLXA0bIfuIp6M86x1iutFtXdpN3TTicINrmSXEE2Ydm51iMu77B08ZERjVaToya2F7vC+egfoPvibf7OLxE336a5tPCywavvNihQjL8sjgpDT5AAScjb3YqK/6VLeQ18Ggt8/ufINsYkb+9/Ji/3OcGFeflnDXq80vPUyF3u4iIylob6RSZenC38cXmQB05tRNxS1B6BXCjMRdy0v4pa7oKM2GA4ADKpNrr0RI9ed+peRFwmsclH
+        test@ansible
     agent_pool_profiles:
       - name: default
         count: 1
@@ -476,7 +499,7 @@
         vm_size: Standard_B2s
         type: VirtualMachineScaleSets
         mode: System
-    node_resource_group: "node{{ noderpfx }}"
+    node_resource_group: node{{ noderpfx }}
     enable_rbac: true
     network_profile:
       load_balancer_sku: standard
@@ -487,7 +510,7 @@
   ansible.builtin.assert:
     that:
       - output.changed
-      - "output.agent_pool_profiles | length == 2"
+      - output.agent_pool_profiles | length == 2
       - output.provisioning_state == 'Succeeded'
       - output.agent_pool_profiles[1].mode == 'System'
   ignore_errors: true
@@ -495,17 +518,19 @@
 
 - name: Update the default2 agent_pool mode from User to System (idempontent)
   azure_rm_aks:
-    name: "aks{{ rpfx }}"
+    name: aks{{ rpfx }}
     resource_group: "{{ resource_group }}"
     location: eastus
-    dns_prefix: "aks{{ rpfx }}"
+    dns_prefix: aks{{ rpfx }}
     kubernetes_version: "{{ version1.azure_aks_versions[0] }}"
     service_principal:
       client_id: "{{ azure_client_id }}"
       client_secret: "{{ azure_secret }}"
     linux_profile:
       admin_username: azureuser
-      ssh_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDSPmiqkvDH1/+MDAVDZT8381aYqp73Odz8cnD5hegNhqtXajqtiH0umVg7HybX3wt1HjcrwKJovZURcIbbcDvzdH2bnYbF93T4OLXA0bIfuIp6M86x1iutFtXdpN3TTicINrmSXEE2Ydm51iMu77B08ZERjVaToya2F7vC+egfoPvibf7OLxE336a5tPCywavvNihQjL8sjgpDT5AAScjb3YqK/6VLeQ18Ggt8/ufINsYkb+9/Ji/3OcGFeflnDXq80vPUyF3u4iIylob6RSZenC38cXmQB05tRNxS1B6BXCjMRdy0v4pa7oKM2GA4ADKpNrr0RI9ed+peRFwmsclH test@ansible
+      ssh_key: ssh-rsa 
+        AAAAB3NzaC1yc2EAAAADAQABAAABAQDSPmiqkvDH1/+MDAVDZT8381aYqp73Odz8cnD5hegNhqtXajqtiH0umVg7HybX3wt1HjcrwKJovZURcIbbcDvzdH2bnYbF93T4OLXA0bIfuIp6M86x1iutFtXdpN3TTicINrmSXEE2Ydm51iMu77B08ZERjVaToya2F7vC+egfoPvibf7OLxE336a5tPCywavvNihQjL8sjgpDT5AAScjb3YqK/6VLeQ18Ggt8/ufINsYkb+9/Ji/3OcGFeflnDXq80vPUyF3u4iIylob6RSZenC38cXmQB05tRNxS1B6BXCjMRdy0v4pa7oKM2GA4ADKpNrr0RI9ed+peRFwmsclH
+        test@ansible
     agent_pool_profiles:
       - name: default
         count: 1
@@ -523,7 +548,7 @@
         vm_size: Standard_B2s
         type: VirtualMachineScaleSets
         mode: System
-    node_resource_group: "node{{ noderpfx }}"
+    node_resource_group: node{{ noderpfx }}
     enable_rbac: true
     network_profile:
       load_balancer_sku: standard
@@ -531,7 +556,7 @@
 
 - name: Get AKS fact
   azure_rm_aks_info:
-    name: "aks{{ rpfx }}"
+    name: aks{{ rpfx }}
     resource_group: "{{ resource_group }}"
     show_kubeconfig: user
   register: fact
@@ -539,12 +564,12 @@
 - name: Assert fact returns the created one
   ansible.builtin.assert:
     that:
-      - "fact.aks | length == 1"
+      - fact.aks | length == 1
       - fact.aks[0].kube_config == output.kube_config
 
 - name: Delete the AKS instance
   azure_rm_aks:
-    name: "aks{{ rpfx }}"
+    name: aks{{ rpfx }}
     resource_group: "{{ resource_group }}"
     state: absent
   register: output
@@ -556,7 +581,7 @@
 
 - name: Delete the AKS instance (idempotent)
   azure_rm_aks:
-    name: "aks{{ rpfx }}"
+    name: aks{{ rpfx }}
     resource_group: "{{ resource_group }}"
     state: absent
   register: output
@@ -568,11 +593,11 @@
 
 - name: Get AKS fact
   azure_rm_aks_info:
-    name: "aks{{ rpfx }}"
+    name: aks{{ rpfx }}
     resource_group: "{{ resource_group }}"
   register: fact
 
 - name: Assert fact returns empty
   ansible.builtin.assert:
     that:
-      - "fact.aks | length == 0"
+      - fact.aks | length == 0
