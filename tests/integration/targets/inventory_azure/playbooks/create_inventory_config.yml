@@ -4,7 +4,7 @@
   connection: local
   gather_facts: false
   vars:
-    template_name: "../templates/{{ template | default('basic.yml') }}"
+    template_name: ../templates/{{ template | default('basic.yml') }}
   tasks:
     - name: Write inventory config file
       ansible.builtin.copy:
