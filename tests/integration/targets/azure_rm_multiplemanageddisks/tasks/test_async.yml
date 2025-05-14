@@ -1,3 +1,4 @@
+---
 # setup: create virtual machines to attach disks on
 - name: Create virtual network
   azure_rm_virtualnetwork:
@@ -25,7 +26,7 @@
     admin_password: "!test123@"
     os_type: Linux
     image:
-      offer: 0001-com-ubuntu-server-focal
+      offer: "0001-com-ubuntu-server-focal"
       publisher: Canonical
       sku: 20_04-lts
       version: latest
