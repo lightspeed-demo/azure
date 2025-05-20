@@ -1,3 +1,4 @@
+---
 - name: Set varialbles
   ansible.builtin.set_fact:
     rpfx: "{{ resource_group | hash('md5') | truncate(8, True, '') }}"
@@ -9,11 +10,11 @@
 
 - name: Use minimal parameters and system-assigned identity
   azure_rm_aks:
-    name: "minimal{{ rpfx }}"
+    name: minimal{{ rpfx }}
     location: eastus
     resource_group: "{{ resource_group }}"
     kubernetes_version: "{{ versions.azure_aks_versions[0] }}"
-    dns_prefix: "aks{{ rpfx }}"
+    dns_prefix: aks{{ rpfx }}
     enable_rbac: true
     aad_profile:
       managed: true
@@ -24,9 +25,9 @@
         mode: System
     api_server_access_profile:
       authorized_ip_ranges:
-        - "192.0.2.0"
-        - "198.51.100.0"
-        - "203.0.113.0"
+        - 192.0.2.0
+        - 198.51.100.0
+        - 203.0.113.0
       enable_private_cluster: false
     network_profile:
       load_balancer_sku: standard
@@ -41,24 +42,24 @@
 
 - name: Get AKS fact
   azure_rm_aks_info:
-    name: "minimal{{ rpfx }}"
+    name: minimal{{ rpfx }}
     resource_group: "{{ resource_group }}"
   register: fact
 
 - name: Assert fact returns the created one
   ansible.builtin.assert:
     that:
-      - "fact.aks | length == 1"
+      - fact.aks | length == 1
       - fact.aks[0].id == output.id
       - fact.aks[0].aad_profile.managed == true
 
 - name: Use minimal parameters and system-assigned identity (idempotent)
   azure_rm_aks:
-    name: "minimal{{ rpfx }}"
+    name: minimal{{ rpfx }}
     location: eastus
     resource_group: "{{ resource_group }}"
     kubernetes_version: "{{ versions.azure_aks_versions[0] }}"
-    dns_prefix: "aks{{ rpfx }}"
+    dns_prefix: aks{{ rpfx }}
     enable_rbac: true
     aad_profile:
       managed: true
@@ -69,9 +70,9 @@
         mode: System
     api_server_access_profile:
       authorized_ip_ranges:
-        - "192.0.2.0"
-        - "198.51.100.0"
-        - "203.0.113.0"
+        - 192.0.2.0
+        - 198.51.100.0
+        - 203.0.113.0
       enable_private_cluster: false
     network_profile:
       load_balancer_sku: standard
@@ -85,11 +86,11 @@
 
 - name: Update api_server_access_profile config
   azure_rm_aks:
-    name: "minimal{{ rpfx }}"
+    name: minimal{{ rpfx }}
     location: eastus
     resource_group: "{{ resource_group }}"
     kubernetes_version: "{{ versions.azure_aks_versions[0] }}"
-    dns_prefix: "aks{{ rpfx }}"
+    dns_prefix: aks{{ rpfx }}
     enable_rbac: true
     agent_pool_profiles:
       - name: default
@@ -98,10 +99,10 @@
         mode: System
     api_server_access_profile:
       authorized_ip_ranges:
-        - "173.0.113.0"
-        - "192.0.2.0"
-        - "198.51.100.0"
-        - "203.0.113.0"
+        - 173.0.113.0
+        - 192.0.2.0
+        - 198.51.100.0
+        - 203.0.113.0
       enable_private_cluster: false
     network_profile:
       load_balancer_sku: standard
@@ -115,7 +116,7 @@
 
 - name: Delete the AKS instance
   azure_rm_aks:
-    name: "minimal{{ rpfx }}"
+    name: minimal{{ rpfx }}
     resource_group: "{{ resource_group }}"
     state: absent
   register: output
@@ -127,11 +128,11 @@
 
 - name: Get AKS fact
   azure_rm_aks_info:
-    name: "minimal{{ rpfx }}"
+    name: minimal{{ rpfx }}
     resource_group: "{{ resource_group }}"
   register: fact
 
 - name: Assert fact returns empty
   ansible.builtin.assert:
     that:
-      - "fact.aks | length == 0"
+      - fact.aks | length == 0
