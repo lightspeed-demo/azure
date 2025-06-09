@@ -1,7 +1,8 @@
+---
 - name: Create storage account name
   ansible.builtin.set_fact:
-    storage_account: "sb{{ resource_group | hash('md5') | truncate(22, True, '') }}"
-    test1_file: "./targets/azure_rm_storageblob/files/Ratings.png"
+    storage_account: sb{{ resource_group | hash('md5') | truncate(22, True, '') }}
+    test1_file: ./targets/azure_rm_storageblob/files/Ratings.png
 
 - name: Create storage account
   azure_rm_storageaccount:
@@ -22,8 +23,8 @@
     resource_group: "{{ resource_group }}"
     account_name: "{{ storage_account }}"
     container_name: my-blobs
-    blob: 'Ratings.png'
-    src: '{{ test1_file }}'
+    blob: Ratings.png
+    src: "{{ test1_file }}"
     content_type: image/png
     tags:
       val1: foo
@@ -35,8 +36,8 @@
     resource_group: "{{ resource_group }}"
     account_name: "{{ storage_account }}"
     container_name: my-blobs
-    blob: 'Ratings.png'
-    src: '{{ test1_file }}'
+    blob: Ratings.png
+    src: "{{ test1_file }}"
     content_type: image/png
     tags:
       val1: foo
@@ -44,15 +45,15 @@
   register: upload_facts
 - name: Assert idempotent
   ansible.builtin.assert:
-    that: "not upload_facts.changed"
+    that: not upload_facts.changed
 
 - name: Download file idempotence
   azure_rm_storageblob:
     resource_group: "{{ resource_group }}"
     account_name: "{{ storage_account }}"
     container_name: my-blobs
-    blob: 'Ratings.png'
-    dest: '{{ test1_file }}'
+    blob: Ratings.png
+    dest: "{{ test1_file }}"
   register: download_results
 - name: Assert idempotent
   ansible.builtin.assert:
@@ -60,7 +61,7 @@
 
 - name: Delete file
   ansible.builtin.file:
-    path: "/tmp/Ratings.png"
+    path: /tmp/Ratings.png
     state: absent
 
 - name: Download file
@@ -68,21 +69,21 @@
     resource_group: "{{ resource_group }}"
     account_name: "{{ storage_account }}"
     container_name: my-blobs
-    blob: 'Ratings.png'
-    dest: '/tmp/Ratings.png'
+    blob: Ratings.png
+    dest: /tmp/Ratings.png
   register: download_results
 - name: Assert download file
   ansible.builtin.assert:
-    that: "download_results.changed"
+    that: download_results.changed
 
 - name: Find file
   ansible.builtin.find:
-    paths: '/tmp'
-    patterns: "Ratings.png"
+    paths: /tmp
+    patterns: Ratings.png
   register: find_results
 - name: Assert matched the file
   ansible.builtin.assert:
-    that: "find_results['matched'] == 1"
+    that: find_results['matched'] == 1
 
 - name: Do not delete container that has blobs
   azure_rm_storageblob:
@@ -93,19 +94,19 @@
   register: output
 - name: Assert no blobs
   ansible.builtin.assert:
-    that: "not output.changed"
+    that: not output.changed
 
 - name: Delete blob object
   azure_rm_storageblob:
     resource_group: "{{ resource_group }}"
     account_name: "{{ storage_account }}"
     container_name: my-blobs
-    blob: "Ratings.png"
+    blob: Ratings.png
     state: absent
   register: output
 - name: Assert the blob deleted
   ansible.builtin.assert:
-    that: "output.changed"
+    that: output.changed
 
 - name: Delete container
   azure_rm_storageblob:
@@ -116,7 +117,7 @@
   register: output
 - name: Assert delete the container
   ansible.builtin.assert:
-    that: "output.changed"
+    that: output.changed
 
 - name: Delete storage account
   azure_rm_storageaccount:

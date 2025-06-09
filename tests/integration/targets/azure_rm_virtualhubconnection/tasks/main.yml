@@ -1,10 +1,11 @@
+---
 - name: Set variables
   ansible.builtin.set_fact:
     rpfx: "{{ resource_group | hash('md5') | truncate(8, True, '') }}"
 
 - name: Create virtual network
   azure_rm_virtualnetwork:
-    name: "vnet{{ rpfx }}"
+    name: vnet{{ rpfx }}
     address_prefixes_cidr:
       - 10.1.0.0/16
       - 172.100.0.0/16
@@ -14,7 +15,7 @@
 - name: Create a Virtual Wan
   azure_rm_virtualwan:
     resource_group: "{{ resource_group }}"
-    name: "virtualwan{{ rpfx }}"
+    name: virtualwan{{ rpfx }}
     office365_local_breakout_category: All
     disable_vpn_encryption: true
     allow_branch_to_branch_traffic: true
@@ -25,7 +26,7 @@
 - name: Create a VirtualHub
   azure_rm_virtualhub:
     resource_group: "{{ resource_group }}"
-    name: "vhub{{ rpfx }}"
+    name: vhub{{ rpfx }}
     sku: Standard
     address_prefix: 12.0.0.0/16
     virtual_wan:
@@ -39,8 +40,8 @@
 - name: Create virtual hub connection
   azure_rm_virtualhubconnection:
     resource_group: "{{ resource_group }}"
-    vhub_name: "vhub{{ rpfx }}"
-    name: "connection{{ rpfx }}"
+    vhub_name: vhub{{ rpfx }}
+    name: connection{{ rpfx }}
     enable_internet_security: true
     allow_remote_vnet_to_use_hub_vnet_gateways: false
     allow_hub_to_remote_vnet_transit: true
@@ -73,8 +74,8 @@
 - name: Create virtual hub connection (idempotent test)
   azure_rm_virtualhubconnection:
     resource_group: "{{ resource_group }}"
-    vhub_name: "vhub{{ rpfx }}"
-    name: "connection{{ rpfx }}"
+    vhub_name: vhub{{ rpfx }}
+    name: connection{{ rpfx }}
     enable_internet_security: true
     allow_remote_vnet_to_use_hub_vnet_gateways: false
     allow_hub_to_remote_vnet_transit: true
@@ -107,8 +108,8 @@
 - name: Update virtual hub connection
   azure_rm_virtualhubconnection:
     resource_group: "{{ resource_group }}"
-    vhub_name: "vhub{{ rpfx }}"
-    name: "connection{{ rpfx }}"
+    vhub_name: vhub{{ rpfx }}
+    name: connection{{ rpfx }}
     enable_internet_security: false
     allow_remote_vnet_to_use_hub_vnet_gateways: false
     allow_hub_to_remote_vnet_transit: true
@@ -143,8 +144,8 @@
 - name: Get virtual hub connection info
   azure_rm_virtualhubconnection_info:
     resource_group: "{{ resource_group }}"
-    virtual_hub_name: "vhub{{ rpfx }}"
-    name: "connection{{ rpfx }}"
+    virtual_hub_name: vhub{{ rpfx }}
+    name: connection{{ rpfx }}
   register: output
 
 - name: Assert fact returns
@@ -159,6 +160,6 @@
 - name: Delete the virtual hub connection
   azure_rm_virtualhubconnection:
     resource_group: "{{ resource_group }}"
-    vhub_name: "vhub{{ rpfx }}"
-    name: "connection{{ rpfx }}"
+    vhub_name: vhub{{ rpfx }}
+    name: connection{{ rpfx }}
     state: absent
