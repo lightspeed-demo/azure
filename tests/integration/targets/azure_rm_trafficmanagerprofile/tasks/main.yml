@@ -1,10 +1,10 @@
+---
 - name: Prepare random number
   ansible.builtin.set_fact:
-    tmname: "tm{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
-    endpointname1: "ep1{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
-    endpointname2: "ep2{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
+    tmname: tm{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}
+    endpointname1: ep1{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}
+    endpointname2: ep2{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}
   run_once: true
-
 
 - name: Create a Traffic Manager profile(check mode)
   azure_rm_trafficmanagerprofile:
@@ -23,7 +23,7 @@
     monitor_config:
       protocol: HTTPS
       port: 80
-      path: '/'
+      path: /
   check_mode: true
 
 - name: Check there is no Traffic Manager profile created
@@ -52,7 +52,7 @@
     monitor_config:
       protocol: HTTPS
       port: 80
-      path: '/'
+      path: /
   register: tm
 
 - name: Assert the Traffic Manager profile is well created
@@ -69,7 +69,7 @@
 - name: Assert fact returns the created one
   ansible.builtin.assert:
     that:
-      - "fact.tms | length == 1"
+      - fact.tms | length == 1
       - fact.tms[0].id == tm.id
       - fact.tms[0].endpoints | length == 0
 
@@ -90,7 +90,7 @@
     monitor_config:
       protocol: HTTPS
       port: 80
-      path: '/'
+      path: /
   register: output
 
 - name: Assert idempotent
@@ -115,7 +115,7 @@
     monitor_config:
       protocol: HTTPS
       port: 80
-      path: '/'
+      path: /
   register: output
 
 - name: Assert the Traffic Manager profile is updated
@@ -261,7 +261,7 @@
 - name: Assert the traffic manager profile is still there
   ansible.builtin.assert:
     that:
-      - "fact.tms | length == 1"
+      - fact.tms | length == 1
       - fact.tms[0].id == tm.id
       - fact.tms[0].endpoints | length == 1
 
@@ -286,4 +286,4 @@
 - name: Assert fact returns empty
   ansible.builtin.assert:
     that:
-      - "fact.tms | length == 0"
+      - fact.tms | length == 0
