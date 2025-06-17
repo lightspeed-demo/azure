@@ -1,7 +1,8 @@
+---
 - name: Create Azure Search name
   ansible.builtin.set_fact:
-    search_name: "search{{ resource_group | hash('md5') | truncate(16, True, '') }}"
-    search_name_secondary: "search{{ resource_group | hash('md5') | truncate(16, True, '') }}-secondary"
+    search_name: search{{ resource_group | hash('md5') | truncate(16, True, '') }}
+    search_name_secondary: search{{ resource_group | hash('md5') | truncate(16, True, '') }}-secondary
 
 - name: Create invalid Azure Search - Hosting Name
   azure_rm_cognitivesearch:
