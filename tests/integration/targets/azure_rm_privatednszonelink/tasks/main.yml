@@ -1,6 +1,7 @@
+---
 - name: Create virtual network link name
   ansible.builtin.set_fact:
-    link_name: "link{{ resource_group | hash('md5') | truncate(22, True, '') }}"
+    link_name: link{{ resource_group | hash('md5') | truncate(22, True, '') }}
 
 - name: Create random number
   ansible.builtin.set_fact:
@@ -19,7 +20,7 @@
 
 - name: Create a virtual network
   azure_rm_virtualnetwork:
-    name: "vnet{{ rpfx }}"
+    name: vnet{{ rpfx }}
     resource_group: "{{ resource_group }}"
     address_prefixes_cidr:
       - 10.1.0.0/16
@@ -30,8 +31,8 @@
 
 - name: Create a subnet
   azure_rm_subnet:
-    name: "subnet{{ rpfx }}"
-    virtual_network_name: "vnet{{ rpfx }}"
+    name: subnet{{ rpfx }}
+    virtual_network_name: vnet{{ rpfx }}
     resource_group: "{{ resource_group }}"
     address_prefix_cidr: 10.1.0.0/24
 
@@ -40,7 +41,7 @@
     resource_group: "{{ resource_group }}"
     name: "{{ link_name }}"
     zone_name: "{{ domain_name }}.com"
-    virtual_network: "vnet{{ rpfx }}"
+    virtual_network: vnet{{ rpfx }}
     state: present
   register: results
 
@@ -53,7 +54,7 @@
     resource_group: "{{ resource_group }}"
     name: "{{ link_name }}"
     zone_name: "{{ domain_name }}.com"
-    virtual_network: "vnet{{ rpfx }}"
+    virtual_network: vnet{{ rpfx }}
     state: present
   register: results
 
@@ -67,7 +68,7 @@
     name: "{{ link_name }}"
     zone_name: "{{ domain_name }}.com"
     registration_enabled: true
-    virtual_network: "vnet{{ rpfx }}"
+    virtual_network: vnet{{ rpfx }}
     state: present
   register: results
 
@@ -116,7 +117,7 @@
 
 - name: Delete virtual network
   azure_rm_virtualnetwork:
-    name: "vnet{{ rpfx }}"
+    name: vnet{{ rpfx }}
     resource_group: "{{ resource_group }}"
     state: absent
 
