@@ -1,3 +1,4 @@
+---
 - name: Set location
   ansible.builtin.set_fact:
     location: eastus
