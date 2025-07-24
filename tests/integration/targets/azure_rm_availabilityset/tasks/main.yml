@@ -1,3 +1,4 @@
+---
 - name: Create an availability set with default options - Check Mode
   azure_rm_availabilityset:
     name: myavailabilityset1
@@ -25,7 +26,7 @@
 
 - name: Create proximity placement group name
   ansible.builtin.set_fact:
-    ppgroup_name: "ppg{{ resource_group | hash('md5') | truncate(22, True, '') }}"
+    ppgroup_name: ppg{{ resource_group | hash('md5') | truncate(22, True, '') }}
 
 - name: Create a proximity placement group
   azure_rm_proximityplacementgroup:
@@ -113,8 +114,7 @@
   ignore_errors: true
 
 - name: Assert the error return
-  ansible.builtin.assert:
-    { that: "'The specified fault domain count 4 must fall in the range 1 to' in results['msg']" }
+  ansible.builtin.assert: { that: "'The specified fault domain count 4 must fall in the range 1 to' in results['msg']" }
 
 - name: Test check_mode
   azure_rm_availabilityset:
