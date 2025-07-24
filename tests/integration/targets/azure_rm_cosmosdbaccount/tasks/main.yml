@@ -1,10 +1,11 @@
+---
 - name: Prepare random number
   ansible.builtin.set_fact:
-    dbname: "cosmos-{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
-    db2name: "cosmos2-{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
-    vnname: "vn{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
-    subnetname: "subnet{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
-    free_tier_supported: false  # https://github.com/ansible-collections/azure/pull/675#discussion_r843584406
+    dbname: cosmos-{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}
+    db2name: cosmos2-{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}
+    vnname: vn{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}
+    subnetname: subnet{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}
+    free_tier_supported: false # https://github.com/ansible-collections/azure/pull/675#discussion_r843584406
   run_once: true
 
 - name: Create virtual network
@@ -23,7 +24,7 @@
     name: "{{ subnetname }}"
     virtual_network_name: "{{ vnname }}"
     resource_group: "{{ resource_group }}"
-    address_prefix_cidr: "10.1.0.0/24"
+    address_prefix_cidr: 10.1.0.0/24
 
 - name: Create instance of Database Account -- check mode
   azure_rm_cosmosdbaccount:
@@ -262,10 +263,10 @@
     kind: mongo_db
     mongo_version: "4.0"
     enable_free_tier: "{{ free_tier_supported }}"
-    public_network_access: "Disabled"
+    public_network_access: Disabled
     ip_rules:
-      - "1.1.1.1"
-      - "2.2.2.2/28"
+      - 1.1.1.1
+      - 2.2.2.2/28
     geo_rep_locations:
       - name: eastasia
         failover_priority: 0
